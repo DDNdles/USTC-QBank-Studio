@@ -25,6 +25,26 @@
 
 > **数据与版权边界**：本仓库代码采用 [MIT License](LICENSE)，**不内置任何课程真题或题库版权内容**。题库数据由浏览器在运行时按需从公开仓库或用户自建源拉取，经 `SHA-256` 校验后缓存于本机 IndexedDB；题面与解答版权归原权利人所有，详阅 [USTC-Question-Bank/NOTICE.md](https://github.com/DDNdles/USTC-Question-Bank/blob/main/NOTICE.md)。
 
+## 界面预览
+
+<p align="center">
+  <img alt="总览 · 学科与课程" src=".github/assets/preview-overview.png" width="100%" />
+  <br />
+  <sub>总览 · 学科与课程</sub>
+</p>
+
+<p align="center">
+  <img alt="出卷 · 中科大 A4 分页试卷预览" src=".github/assets/preview-pdf.png" width="100%" />
+  <br />
+  <sub>出卷 · 中科大 A4 分页试卷预览（奇数页装订线 · PDF / HTML / XeLaTeX）</sub>
+</p>
+
+<p align="center">
+  <img alt="PPT · review-classic 16:9 讲评课件" src=".github/assets/preview-ppt.png" width="100%" />
+  <br />
+  <sub>PPT · <code>review-classic</code> 16:9 讲评课件与 <code>.pptx</code> 导出</sub>
+</p>
+
 <img alt="01" src=".github/assets/route-01.svg" width="100%" />
 
 ## 功能模块
@@ -67,7 +87,7 @@
 ```text
 USTC-QBank-Studio/
 ├── .github/
-│   ├── assets/                   # README 顶图与路线图分隔 SVG
+│   ├── assets/                   # README 顶图、界面预览截图与路线图分隔 SVG
 │   └── workflows/deploy.yml      # GitHub Pages 自动构建部署
 ├── public/
 │   ├── favicon.svg               # 矢量题卷标识
