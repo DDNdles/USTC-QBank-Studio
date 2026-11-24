@@ -70,7 +70,7 @@ USTC-QBank-Studio/
 │   ├── assets/                   # README 顶图与路线图分隔 SVG
 │   └── workflows/deploy.yml      # GitHub Pages 自动构建部署
 ├── public/
-│   ├── favicon.svg               # 几何 Q 标识
+│   ├── favicon.svg               # 矢量题卷标识
 │   ├── images/                   # 主视觉与学科插画
 │   └── templates/ppt/review-classic/assets/   # dsh-study 原版 PPT 底纹与图标
 └── src/

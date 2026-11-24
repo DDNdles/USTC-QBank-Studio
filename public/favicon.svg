@@ -1,5 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="7" fill="#FAF9F6"/>
-  <path d="M19.8 22.2A9.2 9.2 0 1 1 22.2 19.8" stroke="#15181E" stroke-width="3.2" stroke-linecap="butt"/>
-  <path d="M17.0 17.0L19.7 17.0L26.6 23.9L23.9 26.6L17.0 19.7Z" fill="#1F5FC9"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <clipPath id="logo-badge"><rect x="14" y="14" width="484" height="484" rx="116"/></clipPath>
+  <rect x="14" y="14" width="484" height="484" rx="116" fill="#FAF9F5" stroke="#DCD8CE" stroke-width="6"/>
+  <g clip-path="url(#logo-badge)" stroke="#E6E3DA" stroke-width="5">
+    <circle cx="512" cy="512" r="150"/>
+    <circle cx="512" cy="512" r="215"/>
+    <circle cx="512" cy="512" r="280" stroke-dasharray="10 18" stroke-linecap="round"/>
+  </g>
+  <path d="M138 100 H298 L374 176 V412 H138 Z" fill="#FFFFFF" stroke="#15181E" stroke-width="20" stroke-linejoin="round"/>
+  <path d="M298 100 L374 176 H298 Z" fill="#2666CF" stroke="#15181E" stroke-width="20" stroke-linejoin="round"/>
+  <rect x="186" y="150" width="26" height="26" rx="5" fill="#2666CF"/>
+  <line x1="186" y1="236" x2="326" y2="236" stroke="#15181E" stroke-width="20" stroke-linecap="round"/>
+  <line x1="186" y1="292" x2="326" y2="292" stroke="#15181E" stroke-width="20" stroke-linecap="round"/>
+  <line x1="186" y1="348" x2="266" y2="348" stroke="#2666CF" stroke-width="20" stroke-linecap="round"/>
 </svg>

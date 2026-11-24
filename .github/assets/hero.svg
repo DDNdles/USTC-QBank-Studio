@@ -9,10 +9,21 @@
   <!-- Eyebrow marker -->
   <rect x="56" y="54" width="8" height="8" fill="#1F5FC9"/>
   <text x="74" y="62.5" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="600" letter-spacing="2.2" fill="#6B6F76">USTC · QUESTION BANK · STUDIO</text>
-  <!-- Geometric Q Logo on right -->
-  <g transform="translate(888, 72) scale(2.6)">
-    <path d="M20.24 22.69A10 10 0 1 1 22.69 20.24" stroke="#15181E" stroke-width="3.5" fill="none" stroke-linecap="butt"/>
-    <path d="M17.2 17.2L20.1 17.2L27.8 24.9L24.9 27.8L17.2 20.1Z" fill="#1F5FC9"/>
+  <!-- Brand Logo (folded document emblem) on right -->
+  <clipPath id="logo-badge"><rect x="14" y="14" width="484" height="484" rx="116"/></clipPath>
+  <g transform="translate(872, 54) scale(0.21875)">
+    <rect x="14" y="14" width="484" height="484" rx="116" fill="#FAF9F5" stroke="#DCD8CE" stroke-width="6"/>
+    <g clip-path="url(#logo-badge)" fill="none" stroke="#E6E3DA" stroke-width="5">
+      <circle cx="512" cy="512" r="150"/>
+      <circle cx="512" cy="512" r="215"/>
+      <circle cx="512" cy="512" r="280" stroke-dasharray="10 18" stroke-linecap="round"/>
+    </g>
+    <path d="M138 100 H298 L374 176 V412 H138 Z" fill="#FFFFFF" stroke="#15181E" stroke-width="20" stroke-linejoin="round"/>
+    <path d="M298 100 L374 176 H298 Z" fill="#2666CF" stroke="#15181E" stroke-width="20" stroke-linejoin="round"/>
+    <rect x="186" y="150" width="26" height="26" rx="5" fill="#2666CF"/>
+    <line x1="186" y1="236" x2="326" y2="236" stroke="#15181E" stroke-width="20" stroke-linecap="round"/>
+    <line x1="186" y1="292" x2="326" y2="292" stroke="#15181E" stroke-width="20" stroke-linecap="round"/>
+    <line x1="186" y1="348" x2="266" y2="348" stroke="#2666CF" stroke-width="20" stroke-linecap="round"/>
   </g>
   <!-- Main Title -->
   <text x="56" y="148" font-family="Inter, 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif" font-size="52" font-weight="700" letter-spacing="-1.2" fill="#15181E">USTC-QBank-Studio</text>
