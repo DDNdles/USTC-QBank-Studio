@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <defs>
+    <radialGradient id="desk-bg" cx="52%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#FAF9F5"/>
+      <stop offset="100%" stop-color="#EFECE3"/>
+    </radialGradient>
+    <linearGradient id="sun-beam" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#E7DFCE" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="book-shadow" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#1C1E21" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#desk-bg)"/>
+  <polygon points="0,0 440,0 180,600 0,600" fill="url(#sun-beam)"/>
+
+  <!-- Open linen-bound academic notebook -->
+  <g filter="url(#book-shadow)" transform="translate(150, 145)">
+    <!-- Linen cover -->
+    <rect x="0" y="12" width="500" height="316" rx="10" fill="#DCD6C8" stroke="#ABA392" stroke-width="1.5"/>
+    <!-- Left page -->
+    <path d="M16,22 H242 C246,22 250,26 250,32 V312 C250,308 244,304 238,304 H16 Z" fill="#FFFDF9" stroke="#CFC9BC" stroke-width="1.2"/>
+    <!-- Right page -->
+    <path d="M484,22 H258 C254,22 250,26 250,32 V312 C250,308 256,304 262,304 H484 Z" fill="#FCFBF7" stroke="#CFC9BC" stroke-width="1.2"/>
+    <!-- Subtle ruled lines -->
+    <g stroke="#E6E2D8" stroke-width="1.1">
+      <line x1="48" y1="84" x2="214" y2="84"/>
+      <line x1="48" y1="114" x2="202" y2="114"/>
+      <line x1="48" y1="144" x2="210" y2="144"/>
+      <line x1="48" y1="174" x2="178" y2="174"/>
+      <line x1="286" y1="84" x2="452" y2="84"/>
+      <line x1="286" y1="114" x2="438" y2="114"/>
+      <line x1="286" y1="144" x2="446" y2="144"/>
+    </g>
+    <!-- Delicate cobalt geometry sketch on right page -->
+    <circle cx="368" cy="222" r="44" fill="none" stroke="#2558B8" stroke-width="1.25" opacity="0.6"/>
+    <path d="M312,240 Q368,162 424,240" fill="none" stroke="#2558B8" stroke-width="1.25" opacity="0.5"/>
+    <!-- Cobalt ribbon bookmark -->
+    <path d="M244,24 V362 L254,348 L264,362 V24 Z" fill="#2558B8" opacity="0.88"/>
+  </g>
+
+  <!-- Minimalist graphite pencil resting diagonally -->
+  <g transform="translate(550, 390) rotate(-32)">
+    <rect x="0" y="0" width="165" height="9" rx="2" fill="#2B2E34"/>
+    <polygon points="165,0 184,4.5 165,9" fill="#E3D2B4"/>
+    <polygon points="178,3 184,4.5 178,6" fill="#2B2E34"/>
+    <rect x="-12" y="0" width="12" height="9" rx="1.5" fill="#C2A373"/>
+  </g>
+</svg>

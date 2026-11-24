@@ -1,0 +1,671 @@
+{
+  "name": "USTC-Question-Bank",
+  "schema_version": "1.0",
+  "data_version": "0.11.0",
+  "updated_at": "2026-11-24",
+  "repository": "https://github.com/DDNdles/USTC-Question-Bank",
+  "asset_base_url": null,
+  "feedback_endpoint": "https://dsh-study-feedback-relay.ddndles.workers.dev/",
+  "license": {
+    "code_and_schema": "MIT",
+    "question_content": "Third-party rights retained by original authors and publishers; see NOTICE.md"
+  },
+  "stats": {
+    "courses": 18,
+    "questions": 8283,
+    "quarantined": 49,
+    "by_origin": {
+      "official": 4510,
+      "community": 1480,
+      "ai": 2293
+    }
+  },
+  "courses": [
+    {
+      "code": "001548",
+      "name": "复变函数B",
+      "name_en": "Complex Analysis (B)",
+      "department": "数学科学学院",
+      "category": "professional",
+      "total": 571,
+      "quarantined": 3,
+      "by_origin": {
+        "official": 229,
+        "community": 26,
+        "ai": 316
+      },
+      "exam_years": [
+        2003,
+        2006,
+        2007,
+        2009,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "paths": {
+        "meta": "courses/001548/meta.json",
+        "taxonomy": "courses/001548/taxonomy.json",
+        "questions": "courses/001548/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "cb27c053fa349525be60ea035e9dd496c1aeb2b959cbd719c9251960c9a08a0d",
+        "taxonomy": "3ad9d35e865c3c994901b9c4a25ad066f68a968c7924cbbd456bcdb7f07e6fcf",
+        "questions": "82b4cb147e6c32e6003e313a673467c8adbff49c018b39d341d1466fec5e1cb3"
+      }
+    },
+    {
+      "code": "MATH1006",
+      "name": "数学分析(B1)",
+      "name_en": "Mathematical Analysis (B1)",
+      "department": "数学科学学院",
+      "category": "common",
+      "total": 445,
+      "quarantined": 0,
+      "by_origin": {
+        "official": 133,
+        "community": 300,
+        "ai": 12
+      },
+      "exam_years": [
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "paths": {
+        "meta": "courses/MATH1006/meta.json",
+        "taxonomy": "courses/MATH1006/taxonomy.json",
+        "questions": "courses/MATH1006/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "4420d4db58b9ac7bde14654c7be48d0eda9efde94199df1b9d3bd22ddfd55017",
+        "taxonomy": "d226ca22ebfabb06ced10e4304e8f85a1f00d94bfea10da6e7a16c8878ab56a4",
+        "questions": "d76b768a356d2519d8c4ebee3a88a9af01ad7836220bb4e8373ba0b4a958385d"
+      }
+    },
+    {
+      "code": "MATH1007",
+      "name": "数学分析(B2)",
+      "name_en": "Mathematical Analysis (B2)",
+      "department": "数学科学学院",
+      "category": "common",
+      "total": 569,
+      "quarantined": 0,
+      "by_origin": {
+        "official": 131,
+        "community": 438,
+        "ai": 0
+      },
+      "exam_years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "paths": {
+        "meta": "courses/MATH1007/meta.json",
+        "taxonomy": "courses/MATH1007/taxonomy.json",
+        "questions": "courses/MATH1007/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "72dbb32980861085f4b8579c907ff40ec8afe48dd8d8d081ba4747c232354807",
+        "taxonomy": "17e6e0b970f3788c9ebc20d68df92f245bbf49ab9581805e270a4e137cfadb32",
+        "questions": "81799adb01324382c79681da3985cc7e58ab75e2ac97bad9bb4e8cb1351d3e5f"
+      }
+    },
+    {
+      "code": "MATH1009",
+      "name": "线性代数(B1)",
+      "name_en": "Linear Algebra (B1)",
+      "department": "数学科学学院",
+      "category": "common",
+      "total": 885,
+      "quarantined": 0,
+      "by_origin": {
+        "official": 611,
+        "community": 273,
+        "ai": 1
+      },
+      "exam_years": [
+        2011,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "paths": {
+        "meta": "courses/MATH1009/meta.json",
+        "taxonomy": "courses/MATH1009/taxonomy.json",
+        "questions": "courses/MATH1009/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "2fe6eb72e11283289a803e6ce4b78b6e8a69a1e4a7db824550e1b5bbd2394d21",
+        "taxonomy": "ba8d0730bb724b58344c8a48e59358e7a8734c29febb55fa863b04fea77d3a02",
+        "questions": "f122609c7ec27d177d938f64d90af43564e8ec7c89ec76f01157abcdf22b8e2a"
+      }
+    },
+    {
+      "code": "CS1003",
+      "name": "计算机程序设计",
+      "name_en": "Computer Programming",
+      "department": "计算机科学与技术学院",
+      "category": "common",
+      "total": 1533,
+      "quarantined": 0,
+      "by_origin": {
+        "official": 1231,
+        "community": 188,
+        "ai": 114
+      },
+      "exam_years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2024,
+        2025
+      ],
+      "paths": {
+        "meta": "courses/CS1003/meta.json",
+        "taxonomy": "courses/CS1003/taxonomy.json",
+        "questions": "courses/CS1003/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "f82e65eb1f6442d39fac54958cacef3cb68ceecda316ab1c96fd0d4412a8f17d",
+        "taxonomy": "46fa2b6f45eaacfac22a15a73debdc51f2dca04a5202afc6c1c8adc16858c663",
+        "questions": "df7d2085da46dab6f88ed301da422b5dde47bf8a1970123cfe76398bbe3bae68"
+      }
+    },
+    {
+      "code": "PHYS1001A",
+      "name": "力学A",
+      "name_en": "Mechanics (A)",
+      "department": "物理学院",
+      "category": "common",
+      "total": 253,
+      "quarantined": 5,
+      "by_origin": {
+        "official": 49,
+        "community": 1,
+        "ai": 203
+      },
+      "exam_years": [
+        2006,
+        2008,
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2016,
+        2017,
+        2018,
+        2020,
+        2021,
+        2023,
+        2024,
+        2025
+      ],
+      "paths": {
+        "meta": "courses/PHYS1001A/meta.json",
+        "taxonomy": "courses/PHYS1001A/taxonomy.json",
+        "questions": "courses/PHYS1001A/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "9797efececbb194a3b6a7b9903a719ca31e136bcc09986745ae6bea6eedf3e7f",
+        "taxonomy": "c4bb47a4850489d389a9e2873c2b30fd6d6d9081af258ff0b7e09f0684cfe8df",
+        "questions": "24e81dec4405ecfefa86d2915b01d656ea7be90067c2fc693f25654967ae01ea"
+      }
+    },
+    {
+      "code": "PHYS1002A",
+      "name": "热学A",
+      "name_en": "Thermal Physics (A)",
+      "department": "物理学院",
+      "category": "common",
+      "total": 352,
+      "quarantined": 3,
+      "by_origin": {
+        "official": 219,
+        "community": 13,
+        "ai": 120
+      },
+      "exam_years": [
+        2004,
+        2009,
+        2012,
+        2015,
+        2016,
+        2017,
+        2021,
+        2022,
+        2024,
+        2025,
+        2026
+      ],
+      "paths": {
+        "meta": "courses/PHYS1002A/meta.json",
+        "taxonomy": "courses/PHYS1002A/taxonomy.json",
+        "questions": "courses/PHYS1002A/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "7137d5df8af7e0e6b66802f2d923dd34f795cf99e90c275214626b298ef94cb0",
+        "taxonomy": "ca7a25046ae104c333b10a82b6d4e55e409ce1330f0cbcd318dfc7d6d282fbbe",
+        "questions": "af490f13a5b159b18d4f457a90590999452f1cc794bf60911bb16238f1468472"
+      }
+    },
+    {
+      "code": "PHYS1004A",
+      "name": "电磁学A",
+      "name_en": "Electromagnetism (A)",
+      "department": "物理学院",
+      "category": "common",
+      "total": 121,
+      "quarantined": 5,
+      "by_origin": {
+        "official": 43,
+        "community": 0,
+        "ai": 78
+      },
+      "exam_years": [
+        2017,
+        2018,
+        2020,
+        2021,
+        2023,
+        2024,
+        2026
+      ],
+      "paths": {
+        "meta": "courses/PHYS1004A/meta.json",
+        "taxonomy": "courses/PHYS1004A/taxonomy.json",
+        "questions": "courses/PHYS1004A/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "afbb8fcad35559455ff9df77b0d0a4dde4e645f41f853f665a9db5000b6a0f89",
+        "taxonomy": "dc37a23b0987cc00d11ab727700b3a1584ffb3419853a2e9698e15a9c361de92",
+        "questions": "06595e603f987866bd49bd5ea06bc2c494cb99c231b1e8f61bdd09a36fda5912"
+      }
+    },
+    {
+      "code": "210070",
+      "name": "数据结构及其算法",
+      "name_en": "Data Structures and Algorithms",
+      "department": "计算机科学与技术学院",
+      "category": "common",
+      "total": 347,
+      "quarantined": 0,
+      "by_origin": {
+        "official": 71,
+        "community": 145,
+        "ai": 131
+      },
+      "exam_years": [
+        2008,
+        2009,
+        2017,
+        2018,
+        2024
+      ],
+      "paths": {
+        "meta": "courses/210070/meta.json",
+        "taxonomy": "courses/210070/taxonomy.json",
+        "questions": "courses/210070/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "82864e1ad5e65f04b962c52d8b27acaa29bc65a1361c431609a3553245930d82",
+        "taxonomy": "5d92b032f29625b74fc8a9dda1caaf389906e180c742a7f7f8d33f5d46c3be70",
+        "questions": "5cd9236937d16bc9005c63a465504c5b270b3ff881607da9c8de07c8536e0875"
+      }
+    },
+    {
+      "code": "STAT2002",
+      "name": "概率论与数理统计",
+      "name_en": "Probability Theory and Mathematical Statistics",
+      "department": "数学科学学院",
+      "category": "common",
+      "total": 431,
+      "quarantined": 3,
+      "by_origin": {
+        "official": 327,
+        "community": 0,
+        "ai": 104
+      },
+      "exam_years": [
+        2003,
+        2004,
+        2005,
+        2006,
+        2007,
+        2008,
+        2010,
+        2011,
+        2012,
+        2013,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "paths": {
+        "meta": "courses/STAT2002/meta.json",
+        "taxonomy": "courses/STAT2002/taxonomy.json",
+        "questions": "courses/STAT2002/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "bcba826f405c87805c9081ff36108261fdfe2ef11ac417762d6bc5a1e48bc120",
+        "taxonomy": "667d86c6930d39052c519697d4dbf924e5b9456d4565b45c61ca6fbfebbcfe44",
+        "questions": "e5b051009c4a46e02bdf619fa6e82bffc77876462a600aff041124cf4b189166"
+      }
+    },
+    {
+      "code": "PHYS1003A",
+      "name": "光学A",
+      "name_en": "Optics A",
+      "department": "物理学院",
+      "category": "common",
+      "total": 228,
+      "quarantined": 3,
+      "by_origin": {
+        "official": 121,
+        "community": 16,
+        "ai": 91
+      },
+      "exam_years": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "paths": {
+        "meta": "courses/PHYS1003A/meta.json",
+        "taxonomy": "courses/PHYS1003A/taxonomy.json",
+        "questions": "courses/PHYS1003A/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "e94517b87a0529d6291b4ddcbf43a72de40882852758e7b0f128745f6a9bdc6a",
+        "taxonomy": "8b371542d876f31cff3a824d8ceab0e5d2d1a855bf4e337d6eaf37771e5bebc6",
+        "questions": "29f4539ce4416d29286b5c186ab28a18a75a2d4cafec838bfcb4c09049ef1fc6"
+      }
+    },
+    {
+      "code": "210050",
+      "name": "数字逻辑电路",
+      "name_en": "Digital Logic Circuits",
+      "department": "信息科学技术学院",
+      "category": "professional",
+      "total": 512,
+      "quarantined": 0,
+      "by_origin": {
+        "official": 449,
+        "community": 23,
+        "ai": 40
+      },
+      "exam_years": [
+        2015,
+        2016,
+        2017,
+        2019,
+        2020,
+        2021,
+        2022
+      ],
+      "paths": {
+        "meta": "courses/210050/meta.json",
+        "taxonomy": "courses/210050/taxonomy.json",
+        "questions": "courses/210050/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "62fb8f26eda382ca638169ef46e8913fdba35486d570325d495262e32573df18",
+        "taxonomy": "2c16cb5964e5d55589aca9b857e4d1a251ca4df54a205ad5602909c445238253",
+        "questions": "78d3def017e5f3e2d109e9f292313c3b6e2c8e571ba2996d40186512241ac0c4"
+      }
+    },
+    {
+      "code": "023181",
+      "name": "线性电子线路",
+      "name_en": "Linear Electronic Circuits",
+      "department": "信息科学技术学院",
+      "category": "professional",
+      "total": 407,
+      "quarantined": 0,
+      "by_origin": {
+        "official": 361,
+        "community": 0,
+        "ai": 46
+      },
+      "exam_years": [
+        2014,
+        2016,
+        2019
+      ],
+      "paths": {
+        "meta": "courses/023181/meta.json",
+        "taxonomy": "courses/023181/taxonomy.json",
+        "questions": "courses/023181/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "e09cd13594ae660da5e4949e18974734aa3c005f650b1ed1e90184c041f20be1",
+        "taxonomy": "13b82f2c1c3797fac4df33f21bb080ddc0b0e2a336ea7a512f4f0c1e291b689a",
+        "questions": "d0cf34bad68a9e85a09c343250ac0226e44963d05366b1d2c6b968fce626ae6b"
+      }
+    },
+    {
+      "code": "EE2003",
+      "name": "计算机原理与嵌入式系统",
+      "name_en": "Principles of Computers and Embedded Systems",
+      "department": "信息科学技术学院",
+      "category": "professional",
+      "total": 505,
+      "quarantined": 13,
+      "by_origin": {
+        "official": 122,
+        "community": 0,
+        "ai": 383
+      },
+      "exam_years": [
+        2020,
+        2024
+      ],
+      "paths": {
+        "meta": "courses/EE2003/meta.json",
+        "taxonomy": "courses/EE2003/taxonomy.json",
+        "questions": "courses/EE2003/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "6c0c8e018e8f1aa1dc3d4fc44d66f8467e37a827abd025704eb163b2b5c1a51a",
+        "taxonomy": "dfde976ca54c9c51f5dc6d9ccec5579918d851afde72c676b37d918d7f1a3e77",
+        "questions": "f75c6b2b03d85b7729b28d56d14d1a6f7c04b926602a2dffc91a50d68ac26def"
+      }
+    },
+    {
+      "code": "MATH1001",
+      "name": "数学分析(A1)",
+      "name_en": "Mathematical Analysis (A1)",
+      "department": "数学科学学院",
+      "category": "common",
+      "total": 169,
+      "quarantined": 2,
+      "by_origin": {
+        "official": 42,
+        "community": 18,
+        "ai": 109
+      },
+      "exam_years": [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "paths": {
+        "meta": "courses/MATH1001/meta.json",
+        "taxonomy": "courses/MATH1001/taxonomy.json",
+        "questions": "courses/MATH1001/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "1f7b98f904ce56bb0af5022396b306b1ce74146d0d1e4fc60ac3e4ca2b355c8b",
+        "taxonomy": "35105be87d67191ce4ebb4db4eff8cb9bdf44e7d196b9aa52ecbba12b4e76e89",
+        "questions": "341d5e2b8f4e6638c943cd9ae337a3b531bdebc1e117b0eb0a55e3f17dbb6c4e"
+      }
+    },
+    {
+      "code": "MATH1002",
+      "name": "数学分析(A2)",
+      "name_en": "Mathematical Analysis (A2)",
+      "department": "数学科学学院",
+      "category": "common",
+      "total": 299,
+      "quarantined": 4,
+      "by_origin": {
+        "official": 34,
+        "community": 27,
+        "ai": 238
+      },
+      "exam_years": [
+        2016,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025,
+        2026
+      ],
+      "paths": {
+        "meta": "courses/MATH1002/meta.json",
+        "taxonomy": "courses/MATH1002/taxonomy.json",
+        "questions": "courses/MATH1002/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "17952d249c09a39399c63e34e62f1e70ac0a6d8528ea1f30a410a69358575588",
+        "taxonomy": "656acad64bf4b5745a2133863d64f1ecd01760dde29a0b0d6edec280269aa825",
+        "questions": "fbd085f5fdcdbd25819abb1680d8203991a890ee4b70e52f72f7493a8fb3ddf3"
+      }
+    },
+    {
+      "code": "PHYS1001B",
+      "name": "力学B",
+      "name_en": "Mechanics (B)",
+      "department": "物理学院",
+      "category": "common",
+      "total": 379,
+      "quarantined": 7,
+      "by_origin": {
+        "official": 161,
+        "community": 12,
+        "ai": 206
+      },
+      "exam_years": [
+        2006,
+        2008,
+        2010,
+        2011,
+        2012,
+        2013,
+        2014,
+        2015,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "paths": {
+        "meta": "courses/PHYS1001B/meta.json",
+        "taxonomy": "courses/PHYS1001B/taxonomy.json",
+        "questions": "courses/PHYS1001B/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "e68ff0b9a292fef88de298e2757f0dd534f9c783b7d0a8403c582c1565c9cffc",
+        "taxonomy": "15eed523d72c7a377f71cdc1b5059cb2c63c768ff72343971d4ff5feb214d5ca",
+        "questions": "07ca9932aa4c0278f297df4e0af1753e4a865f34c86f0382e3f905a1fdac22e8"
+      }
+    },
+    {
+      "code": "PHYS1002B",
+      "name": "热学B",
+      "name_en": "Thermal Physics (B)",
+      "department": "物理学院",
+      "category": "common",
+      "total": 277,
+      "quarantined": 1,
+      "by_origin": {
+        "official": 176,
+        "community": 0,
+        "ai": 101
+      },
+      "exam_years": [
+        2004,
+        2009,
+        2012,
+        2015,
+        2016,
+        2017,
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+        2023,
+        2025
+      ],
+      "paths": {
+        "meta": "courses/PHYS1002B/meta.json",
+        "taxonomy": "courses/PHYS1002B/taxonomy.json",
+        "questions": "courses/PHYS1002B/questions.jsonl"
+      },
+      "sha256": {
+        "meta": "7eb156e34ee0c448c4762f7ef73ef83fbd631dca1c17f541d7aa9b51565839c9",
+        "taxonomy": "30625b0fff90371308944f1a4d84f81f4c81de5911ca0ef389f333f86a25e4ca",
+        "questions": "7b37e5bef6263136db29b7ef5480dc7c972c1a015bb3900d9cf2e818d883913a"
+      }
+    }
+  ]
+}

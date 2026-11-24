@@ -1,0 +1,229 @@
+@import "tailwindcss";
+@import "katex/dist/katex.min.css";
+
+:root {
+  --bg-canvas: #FAF9F6;
+  --bg-paper: #FFFFFF;
+  --bg-subtle: #F3F1EC;
+  --bg-hover: #ECE9E2;
+  --border-hairline: #E6E3DA;
+  --border-strong: #D3CFC4;
+  --ink-primary: #1C1E21;
+  --ink-secondary: #535862;
+  --ink-muted: #848994;
+  --accent: #2558B8;
+  --accent-soft: rgba(37, 88, 184, 0.08);
+  --accent-border: rgba(37, 88, 184, 0.22);
+  --amber: #B46519;
+  --amber-soft: rgba(180, 101, 25, 0.09);
+  --comment-red: #C01C28;
+  --comment-red-soft: rgba(192, 28, 40, 0.07);
+  --mastered: #1B7A52;
+  --mastered-soft: rgba(27, 122, 82, 0.09);
+  --shadow-paper: 0 1px 2px rgba(24, 24, 27, 0.04), 0 8px 28px -8px rgba(24, 24, 27, 0.06);
+  --shadow-sheet: 0 2px 6px rgba(24, 24, 27, 0.04), 0 18px 42px -12px rgba(24, 24, 27, 0.10);
+  --glass-bg: rgba(252, 251, 248, 0.74);
+  --glass-border: rgba(255, 255, 255, 0.72);
+  --glass-outline: rgba(28, 30, 33, 0.08);
+  --glass-pill: rgba(28, 30, 33, 0.075);
+  --font-serif: "Newsreader", "Noto Serif SC", "Songti SC", Georgia, serif;
+  --font-sans: "Inter", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+[data-theme="dark"] {
+  --bg-canvas: #16171A;
+  --bg-paper: #1D1F24;
+  --bg-subtle: #25282F;
+  --bg-hover: #2E323B;
+  --border-hairline: #2C3038;
+  --border-strong: #3E4450;
+  --ink-primary: #EDEBE5;
+  --ink-secondary: #A6ABB6;
+  --ink-muted: #767C89;
+  --accent: #689BF8;
+  --accent-soft: rgba(104, 155, 248, 0.14);
+  --accent-border: rgba(104, 155, 248, 0.30);
+  --amber: #E5A44E;
+  --amber-soft: rgba(229, 164, 78, 0.14);
+  --comment-red: #F06A73;
+  --comment-red-soft: rgba(240, 106, 115, 0.14);
+  --mastered: #46B985;
+  --mastered-soft: rgba(70, 185, 133, 0.14);
+  --shadow-paper: 0 1px 2px rgba(0, 0, 0, 0.28), 0 10px 30px -10px rgba(0, 0, 0, 0.45);
+  --shadow-sheet: 0 4px 12px rgba(0, 0, 0, 0.35), 0 22px 50px -14px rgba(0, 0, 0, 0.55);
+  --glass-bg: rgba(29, 31, 36, 0.76);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-outline: rgba(0, 0, 0, 0.45);
+  --glass-pill: rgba(255, 255, 255, 0.11);
+}
+
+@layer base {
+  html {
+    background-color: var(--bg-canvas);
+    color: var(--ink-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--bg-canvas);
+    color: var(--ink-primary);
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+}
+
+.font-editorial {
+  font-family: var(--font-serif);
+}
+
+.font-mono-num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.paper-card {
+  background: var(--bg-paper);
+  border: 1px solid var(--border-hairline);
+  box-shadow: var(--shadow-paper);
+}
+
+.paper-sheet {
+  background: #FFFFFF;
+  color: #16181D;
+  border: 1px solid #E4E1D8;
+  box-shadow: var(--shadow-sheet);
+}
+
+.glass-header {
+  background: var(--glass-bg);
+  backdrop-filter: blur(22px) saturate(175%);
+  -webkit-backdrop-filter: blur(22px) saturate(175%);
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.glass-dock {
+  background: var(--glass-bg);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid var(--glass-outline);
+  box-shadow:
+    inset 0 1px 0 0 var(--glass-border),
+    0 12px 34px -8px rgba(15, 17, 22, 0.22),
+    0 2px 8px -2px rgba(15, 17, 22, 0.10);
+}
+
+/* Subtle editorial scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-muted);
+}
+
+/* KaTeX math prose polish */
+.rich-math .katex-display {
+  margin: 0.7em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 2px 0;
+}
+.rich-math p {
+  margin: 0.35em 0;
+}
+.rich-math p:first-child {
+  margin-top: 0;
+}
+.rich-math p:last-child {
+  margin-bottom: 0;
+}
+.rich-math table {
+  border-collapse: collapse;
+  margin: 0.75em auto;
+  font-size: 0.92em;
+}
+.rich-math th,
+.rich-math td {
+  border: 1px solid var(--border-strong);
+  padding: 5px 12px;
+  text-align: center;
+}
+
+/* Exam sheet preview styles (always light paper like a real printed sheet) */
+.exam-paper-render {
+  font-family: "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
+  color: #14161A;
+  line-height: 1.85;
+}
+.exam-paper-render .exam-header-title {
+  font-family: "Noto Sans SC", "Microsoft YaHei", "SimHei", sans-serif;
+}
+.exam-paper-render table.score-table {
+  border-collapse: collapse;
+  margin: 14px auto 22px;
+  font-size: 13.5px;
+}
+.exam-paper-render table.score-table td {
+  border: 1px solid #374151;
+  padding: 5px 14px;
+  text-align: center;
+  min-width: 34px;
+}
+.exam-paper-render .rich-math th,
+.exam-paper-render .rich-math td {
+  border-color: #4b5563;
+}
+
+/* Print mode: hide app chrome, print clean A4 sheet */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm 15mm 16mm 24mm;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+  .exam-q-item {
+    break-inside: avoid;
+  }
+  .exam-page-break {
+    break-before: page;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

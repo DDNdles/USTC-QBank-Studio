@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900">
+  <defs>
+    <filter id="paper-grain" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="3" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.032 0"/>
+    </filter>
+    <radialGradient id="paper-bg" cx="50%" cy="46%" r="65%">
+      <stop offset="0%" stop-color="#FAF8F3"/>
+      <stop offset="100%" stop-color="#F2EEE5"/>
+    </radialGradient>
+    <linearGradient id="amber-wash" x1="0%" y1="0%" x2="100%" y2="80%">
+      <stop offset="0%" stop-color="#C97A22" stop-opacity="0.78"/>
+      <stop offset="55%" stop-color="#D99B4E" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#E7C286" stop-opacity="0.06"/>
+    </linearGradient>
+    <linearGradient id="cobalt-wash" x1="0%" y1="15%" x2="100%" y2="95%">
+      <stop offset="0%" stop-color="#2558B8" stop-opacity="0.62"/>
+      <stop offset="60%" stop-color="#507FD6" stop-opacity="0.24"/>
+      <stop offset="100%" stop-color="#8FAFE8" stop-opacity="0.05"/>
+    </linearGradient>
+    <linearGradient id="prism-glass" x1="20%" y1="5%" x2="85%" y2="95%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.88"/>
+      <stop offset="48%" stop-color="#DCE6F5" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#C4B69F" stop-opacity="0.28"/>
+    </linearGradient>
+    <linearGradient id="prism-face" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E8EEF8" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#B99C73" stop-opacity="0.24"/>
+    </linearGradient>
+    <filter id="soft-blur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="900" fill="url(#paper-bg)"/>
+  <rect width="1200" height="900" filter="url(#paper-grain)"/>
+
+  <!-- Hairline orbital & optical construction grid (matching subject-math gold/charcoal lines) -->
+  <g fill="none" stroke="#B6A88A" stroke-width="1.15" opacity="0.68">
+    <circle cx="580" cy="460" r="345"/>
+    <ellipse cx="580" cy="460" rx="430" ry="185" transform="rotate(-14 580 460)"/>
+    <ellipse cx="580" cy="460" rx="390" ry="130" transform="rotate(24 580 460)"/>
+    <line x1="110" y1="460" x2="1090" y2="460" stroke-dasharray="4 6"/>
+    <line x1="580" y1="90" x2="580" y2="810" stroke-dasharray="4 6"/>
+  </g>
+
+  <!-- Concentric wave interference ripples on right -->
+  <g fill="none" stroke="#5A6270" stroke-width="1" opacity="0.32">
+    <circle cx="810" cy="450" r="65"/>
+    <circle cx="810" cy="450" r="112"/>
+    <circle cx="810" cy="450" r="160"/>
+    <circle cx="810" cy="450" r="208"/>
+    <circle cx="810" cy="450" r="256"/>
+  </g>
+
+  <!-- Incoming calm ray from left -->
+  <line x1="145" y1="530" x2="492" y2="435" stroke="#2D333D" stroke-width="2.2" opacity="0.72"/>
+  <line x1="145" y1="530" x2="492" y2="435" stroke="#C97A22" stroke-width="9" opacity="0.14" filter="url(#soft-blur)"/>
+
+  <!-- Refracted translucent amber + cobalt dispersion ribbons -->
+  <polygon points="596,418 1040,268 1040,392 618,454" fill="url(#amber-wash)"/>
+  <polygon points="614,442 1040,382 1040,515 628,476" fill="url(#cobalt-wash)"/>
+  <polygon points="622,462 1040,498 1040,598 634,492" fill="url(#amber-wash)" opacity="0.52"/>
+
+  <!-- Subtle internal beam inside prism -->
+  <polygon points="492,435 596,418 634,492 508,458" fill="#FFFFFF" opacity="0.55"/>
+
+  <!-- Sculptural Minimalist Glass Prism -->
+  <polygon points="565,208 386,628 748,628" fill="url(#prism-glass)" stroke="#2F3744" stroke-width="1.6" stroke-linejoin="round"/>
+  <polygon points="565,208 612,566 748,628" fill="url(#prism-face)" stroke="#2F3744" stroke-width="1.15" stroke-linejoin="round" opacity="0.85"/>
+  <line x1="565" y1="208" x2="612" y2="566" stroke="#FFFFFF" stroke-width="1.8" opacity="0.75"/>
+  <line x1="386" y1="628" x2="612" y2="566" stroke="#2F3744" stroke-width="1" stroke-dasharray="5 5" opacity="0.5"/>
+
+  <!-- Precision architectural node markers -->
+  <g fill="#FAF8F3" stroke="#2558B8" stroke-width="1.8">
+    <circle cx="565" cy="208" r="5"/>
+    <circle cx="492" cy="435" r="4.5" stroke="#B46519"/>
+    <circle cx="614" cy="442" r="4.5"/>
+    <circle cx="810" cy="450" r="4.5" stroke="#B46519"/>
+  </g>
+</svg>
