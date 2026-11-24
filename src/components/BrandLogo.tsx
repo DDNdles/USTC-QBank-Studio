@@ -15,16 +15,16 @@ export function BrandLogo({
       aria-hidden="true"
       className={className}
     >
-      {/* Swiss geometric Q ring with crisp 45° lower-right aperture */}
+      {/* Centered geometric ring (cx=14.5, cy=14.5, r=10) with crisp 20° aperture at 45° */}
       <path
-        d="M23.5 21.1A10.5 10.5 0 1 1 21.1 23.5"
+        d="M20.24 22.69A10 10 0 1 1 22.69 20.24"
         stroke="var(--ink-primary)"
-        strokeWidth="3.6"
+        strokeWidth="3.5"
         strokeLinecap="butt"
       />
-      {/* Precision cobalt-blue diagonal nib / Q-tail facet */}
+      {/* Precision cobalt-blue 45° diagonal tail / nib bisecting the aperture */}
       <path
-        d="M17.2 17.2L20.4 17.2L27.8 24.6L24.6 27.8L17.2 20.4Z"
+        d="M17.2 17.2L20.1 17.2L27.8 24.9L24.9 27.8L17.2 20.1Z"
         fill="var(--accent)"
       />
     </svg>
