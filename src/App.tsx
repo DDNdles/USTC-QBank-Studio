@@ -3,13 +3,11 @@ import { MotionConfig, AnimatePresence, motion } from 'framer-motion'
 import { StudyProvider, useStudy } from './context/StudyContext'
 import { NavigationShell } from './components/NavigationShell'
 import { FeedbackModal } from './components/FeedbackModal'
-import { AddMistakeModal } from './components/AddMistakeModal'
 import { CommandPalette } from './components/CommandPalette'
 import { HomeView } from './views/HomeView'
 import { BankView } from './views/BankView'
 import { PaperStudioView } from './views/PaperStudioView'
 import { PptStudioView } from './views/PptStudioView'
-import { MistakesView } from './views/MistakesView'
 import { SourcesView } from './views/SourcesView'
 import type { QuestionRecord } from './types/study'
 
@@ -19,7 +17,6 @@ function StudioShell() {
     source_id: string
     question: QuestionRecord
   } | null>(null)
-  const [addMistakeOpen, setAddMistakeOpen] = useState(false)
   const [commandOpen, setCommandOpen] = useState(false)
 
   useEffect(() => {
@@ -49,13 +46,11 @@ function StudioShell() {
           {activeTab === 'bank' && <BankView onOpenFeedback={setFeedbackTarget} />}
           {activeTab === 'paper' && <PaperStudioView />}
           {activeTab === 'ppt' && <PptStudioView />}
-          {activeTab === 'mistakes' && <MistakesView onOpenAddModal={() => setAddMistakeOpen(true)} />}
           {activeTab === 'sources' && <SourcesView />}
         </motion.div>
       </AnimatePresence>
 
       <FeedbackModal target={feedbackTarget} onClose={() => setFeedbackTarget(null)} />
-      <AddMistakeModal open={addMistakeOpen} onClose={() => setAddMistakeOpen(false)} />
       <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
 
       {/* Editorial Toast Notification */}

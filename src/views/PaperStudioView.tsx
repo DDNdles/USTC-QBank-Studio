@@ -6,6 +6,7 @@ import {
   Code2,
   Database,
   Download,
+  ExternalLink,
   FileText,
   Maximize2,
   Minimize2,
@@ -20,6 +21,7 @@ import {
 import { useStudy } from '../context/StudyContext'
 import { TaxonomyTreeSelect } from '../components/TaxonomyTreeSelect'
 import { RichMath, QuestionFigures } from '../components/RichMath'
+import { UstcBindingLine } from '../components/UstcBindingLine'
 import {
   assemblePaperFromPool,
   chineseNumber,
@@ -31,8 +33,12 @@ import {
   buildExamLatex,
   buildPdfFields,
   buildStandaloneExamHtml,
+  extractChoiceKey,
+  formatDisplayTerm,
   formatSectionScore,
   groupItems,
+  openInOverleaf,
+  printExamViaIframe,
   resolveSolutionText,
   shouldShowAnswerLine,
 } from '../engine/examRenderer'
@@ -191,9 +197,17 @@ export function PaperStudioView() {
     showToast(`已导出 XeLaTeX 源码（${templateId} 模板）`, 'success')
   }
 
+  const handleOpenOverleaf = () => {
+    if (!activePaper || !effectiveFields) return
+    const tex = buildExamLatex(activePaper, templateId, exportMode, effectiveFields)
+    openInOverleaf(tex, activePaper.title)
+    showToast('已打开 Overleaf（XeLaTeX）', 'info')
+  }
+
   const handlePrintPdf = () => {
-    if (!activePaper) return
-    window.print()
+    if (!activePaper || !effectiveFields) return
+    const html = buildStandaloneExamHtml(activePaper, templateId, exportMode, effectiveFields, sourceMap)
+    printExamViaIframe(html)
   }
 
   if (!questions.length && !papers.length) {
@@ -833,6 +847,15 @@ export function PaperStudioView() {
               <button
                 type="button"
                 disabled={!activePaper}
+                onClick={handleOpenOverleaf}
+                className="inline-flex items-center gap-1 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-canvas)] px-2.5 py-1.5 text-xs text-[var(--ink-primary)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 cursor-pointer"
+                title="使用 Overleaf XeLaTeX 编译原版模板"
+              >
+                <ExternalLink className="h-3.5 w-3.5 text-[var(--mastered)]" /> Overleaf
+              </button>
+              <button
+                type="button"
+                disabled={!activePaper}
                 onClick={() => setActiveTab('ppt')}
                 className="inline-flex items-center gap-1 rounded-xl border border-[var(--accent-border)] bg-[var(--accent-soft)] px-2.5 py-1.5 text-xs font-medium text-[var(--accent)] disabled:opacity-40 cursor-pointer"
               >
@@ -842,207 +865,246 @@ export function PaperStudioView() {
                 type="button"
                 onClick={() => setFocusMode(v => !v)}
                 className="hidden xl:inline-flex items-center justify-center rounded-xl border border-[var(--border-hairline)] p-1.5 text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] cursor-pointer"
-                title={focusMode ? '退出专注阅读' : 'Typora 专注阅读模式'}
+                title={focusMode ? '退出专注阅读' : '专注阅读模式'}
               >
                 {focusMode ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
               </button>
             </div>
           </div>
 
-          {/* Authentic A4 Paper Preview Sheet */}
+          {/* Pixel-Faithful dsh-study A4 Paper Preview Sheet */}
           {activePaper && effectiveFields ? (
             <motion.div
               key={`${activePaper.paper_id}-${templateId}-${exportMode}-${splitTab}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.28 }}
-              className={`print-only-sheet paper-sheet exam-paper-render relative rounded-2xl overflow-hidden ${
+              className={`print-only-sheet paper-sheet exam-paper-render relative rounded-sm overflow-hidden min-h-[1040px] flex flex-col ${
                 templateId === 'ustc-exam' && effectiveFields.showBindingLine && !answerOnly
-                  ? 'pl-14 sm:pl-20 pr-5 sm:pr-12 py-8 sm:py-11'
-                  : 'px-5 sm:px-12 py-8 sm:py-11'
+                  ? 'pl-[68px] sm:pl-[104px] pr-5 sm:pr-[68px] py-10 sm:py-[72px]'
+                  : 'px-6 sm:px-[68px] py-10 sm:py-[72px]'
               }`}
             >
-              {/* USTC Left Vertical Binding Line */}
+              {/* Exact TikZ 4-Hole USTC Left Binding Line */}
               {templateId === 'ustc-exam' && effectiveFields.showBindingLine && !answerOnly && (
-                <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 sm:w-16 border-r border-dashed border-neutral-500 flex items-center justify-center gap-1.5 text-[10px] text-neutral-600 select-none">
-                  <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
-                    院系：________　姓名：______　学号：________
-                  </div>
-                  <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }} className="text-neutral-400">
-                    装订线 · 答题请勿超线
-                  </div>
-                </div>
+                <UstcBindingLine className="pointer-events-none select-none absolute left-0 top-0 h-[1060px] w-[62px] sm:w-[94px]" />
               )}
 
-              {/* Exam Header */}
-              <header className="text-center mb-5">
-                {templateId === 'ustc-exam' && effectiveFields.schoolTerm && (
-                  <div className="exam-header-title text-lg sm:text-xl font-bold tracking-wide">
-                    {effectiveFields.schoolTerm}
+              <div className="flex-1">
+                {/* Exam Header */}
+                {templateId === 'gaokao' ? (
+                  answerOnly ? (
+                    <header className="text-center mb-6">
+                      <div className="exam-heiti-bold text-[18px] sm:text-[19px] text-black">
+                        {effectiveFields.courseTitle}——参考答案与解析
+                      </div>
+                    </header>
+                  ) : (
+                    <>
+                      <div className="exam-heiti-bold text-[14.5px] tracking-[0.14em] text-black mb-3">
+                        绝密 ★ 启用前
+                      </div>
+                      <header className="text-center mb-5">
+                        <div className="text-[18px] sm:text-[19.5px] text-black leading-snug">
+                          {effectiveFields.courseTitle}
+                        </div>
+                        <div className="exam-heiti-bold text-[26px] sm:text-[29px] tracking-[0.22em] text-black mt-1">
+                          {effectiveFields.subject}
+                        </div>
+                      </header>
+                      <div className="mb-6 text-[13.5px] leading-[1.7] text-black">
+                        <div className="exam-heiti-bold mb-0.5">注意事项：</div>
+                        <ol className="list-decimal pl-5 space-y-0.5">
+                          <li>答卷前，考生务必将自己的姓名、学号或准考证号填写清楚。</li>
+                          <li>客观题请在括号内填涂正确选项；非选择题应写出必要的文字说明、证明过程或演算步骤。</li>
+                          <li>本试卷共 {activePaper.items.length} 题，满分 {totalScore} 分。</li>
+                        </ol>
+                      </div>
+                    </>
+                  )
+                ) : (
+                  <header className="text-center mb-4">
+                    {effectiveFields.schoolTerm && (
+                      <div className="exam-heiti-bold text-[17.5px] sm:text-[19px] leading-[1.45] text-black">
+                        {formatDisplayTerm(effectiveFields.schoolTerm)}
+                      </div>
+                    )}
+                    <div className="exam-heiti-bold text-[17.5px] sm:text-[19px] leading-[1.45] text-black mt-1">
+                      {effectiveFields.courseTitle}
+                      {answerOnly ? ' ——参考答案与解析' : ''}
+                    </div>
+                    <div className="mt-3 text-[13.5px] sm:text-[14.5px] text-black">
+                      考试时间{' '}
+                      <span className="inline-block min-w-[106px] border-b border-black px-3 text-center leading-[1.3]">
+                        {effectiveFields.examDate}
+                      </span>
+                      <span className="inline-block w-8 sm:w-12" />
+                      考试形式{' '}
+                      <span className="inline-block min-w-[106px] border-b border-black px-3 text-center leading-[1.3]">
+                        {effectiveFields.examForm}
+                      </span>
+                    </div>
+                  </header>
+                )}
+
+                {/* USTC Score Table */}
+                {templateId === 'ustc-exam' && !answerOnly && groups.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="score-table">
+                      <tbody>
+                        <tr>
+                          <td className="exam-heiti-bold">题号</td>
+                          {groups.map((_, i) => <td key={i}>{chineseNumber(i + 1)}</td>)}
+                          <td className="exam-heiti-bold">总分</td>
+                        </tr>
+                        <tr>
+                          <td className="exam-heiti-bold">满分</td>
+                          {groups.map((g, i) => <td key={i}>{g.score}</td>)}
+                          <td>{totalScore}</td>
+                        </tr>
+                        <tr>
+                          <td className="exam-heiti-bold">得分</td>
+                          {groups.map((_, i) => <td key={i} className="min-w-[44px]">&nbsp;</td>)}
+                          <td className="min-w-[50px]">&nbsp;</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 )}
-                <div className="exam-header-title text-lg sm:text-xl font-bold mt-0.5">
-                  {effectiveFields.courseTitle}
-                  {answerOnly ? '——参考答案与解析' : ''}
-                </div>
-                <div className="mt-2 text-xs sm:text-sm text-neutral-600">
-                  {templateId === 'ustc-exam' ? (
-                    <>
-                      考试时间 <span className="inline-block border-b border-neutral-600 px-3">{effectiveFields.examDate}</span>
-                      {'　　'}
-                      考试形式 <span className="inline-block border-b border-neutral-600 px-3">{effectiveFields.examForm}</span>
-                    </>
-                  ) : (
-                    <>科目：{effectiveFields.subject}　·　满分：{totalScore} 分　·　{effectiveFields.examDate}</>
-                  )}
-                </div>
-              </header>
 
-              {/* Gaokao Notice */}
-              {templateId === 'gaokao' && !answerOnly && (
-                <div className="mb-5 rounded border border-neutral-300 px-4 py-2.5 text-xs leading-relaxed text-neutral-700">
-                  <div className="font-bold tracking-[0.2em] mb-1">绝密 ★ 启用前</div>
-                  <ol className="list-decimal pl-4 space-y-0.5">
-                    <li>答卷前，考生务必将自己的姓名、学号填写清楚。</li>
-                    <li>客观题请准确填涂选项；非选择题应写出必要的文字说明、证明过程或演算步骤。</li>
-                    <li>本试卷共 {activePaper.items.length} 题，满分 {totalScore} 分。</li>
-                  </ol>
-                </div>
-              )}
+                {/* Sections & Hanging-Indent Questions */}
+                <div className="space-y-5">
+                  {(() => {
+                    let seq = 0
+                    return groups.map((group, secIdx) => (
+                      <section key={`${group.key}-${secIdx}`} className="space-y-3.5">
+                        {templateId === 'gaokao' ? (
+                          <h2 className="exam-heiti-bold text-[15px] text-black">
+                            {chineseNumber(secIdx + 1)}、{group.title}：{formatSectionScore(group)}
+                          </h2>
+                        ) : (
+                          <h2 className="text-[14.5px] font-normal text-black">
+                            <span className="exam-heiti-bold">{chineseNumber(secIdx + 1)}.</span> ({formatSectionScore(group)}) {group.title}
+                          </h2>
+                        )}
 
-              {/* USTC Score Table */}
-              {templateId === 'ustc-exam' && !answerOnly && groups.length > 0 && (
-                <div className="overflow-x-auto">
-                  <table className="score-table">
-                    <tbody>
-                      <tr>
-                        <td><strong>题号</strong></td>
-                        {groups.map((_, i) => <td key={i}>{chineseNumber(i + 1)}</td>)}
-                        <td><strong>总分</strong></td>
-                      </tr>
-                      <tr>
-                        <td><strong>满分</strong></td>
-                        {groups.map((g, i) => <td key={i}>{g.score}</td>)}
-                        <td>{totalScore}</td>
-                      </tr>
-                      <tr>
-                        <td><strong>得分</strong></td>
-                        {groups.map((_, i) => <td key={i}>&nbsp;</td>)}
-                        <td>&nbsp;</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                        <div className="space-y-4">
+                          {group.items.map(item => {
+                            seq++
+                            const q = item.question
+                            const solText = resolveSolutionText(q)
+                            const comment = buildCommentText(item, q)
+                            const label = q.type === 'proof' ? '证明' : '解'
+                            const writeH =
+                              effectiveFields.writeSpace === 'compact'
+                                ? 'h-24'
+                                : effectiveFields.writeSpace === 'spacious'
+                                  ? 'h-56'
+                                  : 'h-40'
+                            const isGkChoice =
+                              templateId === 'gaokao' &&
+                              !answerOnly &&
+                              (q.type === 'single' || q.type === 'multi')
+                            const isGkScored =
+                              templateId === 'gaokao' &&
+                              !answerOnly &&
+                              (q.type === 'solve' || q.type === 'proof')
 
-              {/* Sections & Questions */}
-              <div className="space-y-6">
-                {(() => {
-                  let seq = 0
-                  return groups.map((group, secIdx) => (
-                    <section key={`${group.key}-${secIdx}`} className="space-y-4">
-                      <h2 className="exam-header-title text-[15px] sm:text-base font-bold">
-                        {chineseNumber(secIdx + 1)}.（{formatSectionScore(group)}）{group.title}
-                      </h2>
+                            return (
+                              <article
+                                key={`${item.source_id}-${item.question_id}-${seq}`}
+                                className="exam-q-item grid grid-cols-[2.35em_minmax(0,1fr)] items-baseline text-[14.5px] text-black"
+                              >
+                                <div className="select-none font-normal">
+                                  {templateId === 'gaokao' ? `${seq}.` : `(${seq})`}
+                                </div>
 
-                      <div className="space-y-4">
-                        {group.items.map(item => {
-                          seq++
-                          const q = item.question
-                          const solText = resolveSolutionText(q)
-                          const comment = buildCommentText(item, q)
-                          const writeH =
-                            effectiveFields.writeSpace === 'compact'
-                              ? 'h-20'
-                              : effectiveFields.writeSpace === 'spacious'
-                                ? 'h-48'
-                                : 'h-32'
-
-                          return (
-                            <article key={`${item.source_id}-${item.question_id}-${seq}`} className="exam-q-item text-[14.5px]">
-                              <div className="font-semibold mb-1">
-                                {templateId === 'gaokao' ? `${seq}.` : `(${seq})`}
-                                {!answerOnly && (
-                                  <span className="font-normal text-neutral-500 text-xs ml-1.5">
-                                    （{item.score} 分）
-                                  </span>
-                                )}
-                              </div>
-
-                              {!answerOnly && (
-                                <>
-                                  <RichMath text={q.stem.md} />
-                                  <QuestionFigures
-                                    figures={q.stem.figures}
-                                    source={sourceMap[item.source_id]}
-                                    sourceId={item.source_id}
-                                    courseCode={q.course_code}
-                                  />
-                                  {q.options?.length > 0 && (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 mt-2 pl-4">
-                                      {q.options.map(opt => (
-                                        <div key={opt.key} className="flex gap-1.5">
-                                          <strong>{opt.key}.</strong>
-                                          <RichMath text={opt.md} />
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </>
-                              )}
-
-                              {showSolutions ? (
-                                <div className="mt-2.5 pl-1 space-y-1.5 text-[14.5px]">
-                                  {shouldShowAnswerLine(q) && (
-                                    <div>
-                                      <strong className="exam-header-title">答案：</strong>
-                                      <RichMath text={q.answer.md} className="inline-block" />
-                                    </div>
-                                  )}
-                                  {solText && (
-                                    <div>
-                                      <strong className="exam-header-title mr-2">
-                                        {q.type === 'proof' ? '证明' : '解'}
-                                      </strong>
-                                      <RichMath text={solText} />
+                                <div className="min-w-0">
+                                  {!answerOnly && (
+                                    <>
+                                      <div>
+                                        {isGkScored && <span className="mr-1">({item.score}分)</span>}
+                                        <RichMath text={q.stem.md} displayMathInline inlineFirstParagraph />
+                                        {isGkChoice && (
+                                          <span className="float-right ml-3">
+                                            (&nbsp;{showSolutions ? extractChoiceKey(q.answer.md) : '\u00A0\u00A0\u00A0\u00A0'}&nbsp;)
+                                          </span>
+                                        )}
+                                      </div>
                                       <QuestionFigures
-                                        figures={q.solution?.figures}
+                                        figures={q.stem.figures}
                                         source={sourceMap[item.source_id]}
                                         sourceId={item.source_id}
                                         courseCode={q.course_code}
                                       />
-                                    </div>
+                                      {q.options?.length > 0 && (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-1.5 mt-2">
+                                          {q.options.map(opt => (
+                                            <div key={opt.key} className="flex items-baseline gap-1.5">
+                                              <span className="shrink-0">{opt.key}.</span>
+                                              <RichMath text={opt.md} displayMathInline inlineFirstParagraph />
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </>
                                   )}
-                                  {comment && (
-                                    <div className="text-[#C01C28] pt-1 text-[14px]">
-                                      <strong>点评：</strong>
-                                      <RichMath text={comment} className="inline-block" />
+
+                                  {showSolutions ? (
+                                    <div className="mt-1.5 space-y-1.5 text-[14.5px]">
+                                      {shouldShowAnswerLine(q) && (
+                                        <div>
+                                          <span className="exam-heiti-bold mr-[0.55em]">
+                                            {templateId === 'gaokao' ? '【答案】' : '答案：'}
+                                          </span>
+                                          <RichMath text={q.answer.md} displayMathInline inlineFirstParagraph />
+                                        </div>
+                                      )}
+                                      {solText && (
+                                        <div>
+                                          <span className="exam-heiti-bold mr-[1em]">
+                                            {templateId === 'gaokao' ? `【${label}】` : label}
+                                          </span>
+                                          <RichMath text={solText} displayMathInline inlineFirstParagraph />
+                                          <QuestionFigures
+                                            figures={q.solution?.figures}
+                                            source={sourceMap[item.source_id]}
+                                            sourceId={item.source_id}
+                                            courseCode={q.course_code}
+                                          />
+                                        </div>
+                                      )}
+                                      {comment && (
+                                        <div className="text-[#C01C28] pt-0.5">
+                                          <span className="exam-heiti-bold">点评：</span>
+                                          <RichMath text={comment} displayMathInline inlineFirstParagraph />
+                                        </div>
+                                      )}
                                     </div>
+                                  ) : (
+                                    (q.type === 'solve' || q.type === 'proof') && <div className={writeH} />
                                   )}
                                 </div>
-                              ) : (
-                                (q.type === 'solve' || q.type === 'proof') && <div className={writeH} />
-                              )}
-                            </article>
-                          )
-                        })}
-                      </div>
-                    </section>
-                  ))
-                })()}
+                              </article>
+                            )
+                          })}
+                        </div>
+                      </section>
+                    ))
+                  })()}
+                </div>
               </div>
 
-              <footer className="mt-10 border-t border-neutral-200 pt-3 text-center text-[11.5px] text-neutral-500">
-                {effectiveFields.footerTerm} · USTC QBank Studio
+              <footer className="mt-12 pt-4 text-center text-[12.5px] text-[#666666]">
+                {templateId === 'gaokao'
+                  ? `${effectiveFields.subject}试题第 1 页（共 1 页）`
+                  : `${effectiveFields.footerTerm ? `${formatDisplayTerm(effectiveFields.footerTerm)}　` : ''}第 1 页（共 1 页）`}
               </footer>
             </motion.div>
           ) : (
             <div className="paper-card rounded-2xl p-12 text-center space-y-3">
-              <FileText className="mx-auto h-10 w-10 text-[var(--ink-muted)]" strokeWidth={1.4} />
-              <div className="font-editorial text-lg font-semibold">在左侧点选条件，一键生成标准试卷</div>
-              <p className="text-xs text-[var(--ink-secondary)]">
-                支持中科大标准卷头、密封装订线、动态得分表与实时红字点评排版。
-              </p>
+              <FileText className="mx-auto h-9 w-9 text-[var(--ink-muted)]" strokeWidth={1.4} />
+              <div className="font-editorial text-lg font-medium">选择条件并生成试卷</div>
             </div>
           )}
         </section>

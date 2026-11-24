@@ -7,13 +7,25 @@ import type { FigureRef, SourceConfig } from '../types/study'
 export function RichMath({
   text,
   className = '',
+  displayMathInline = false,
+  inlineFirstParagraph = false,
 }: {
   text?: string | null
   className?: string
+  displayMathInline?: boolean
+  inlineFirstParagraph?: boolean
 }) {
-  const html = useMemo(() => renderMarkdownToHtml(text ?? ''), [text])
+  const html = useMemo(
+    () => renderMarkdownToHtml(text ?? '', { displayMathInline }),
+    [text, displayMathInline],
+  )
   if (!html) return null
-  return <div className={`rich-math ${className}`} dangerouslySetInnerHTML={{ __html: html }} />
+  return (
+    <div
+      className={`rich-math ${inlineFirstParagraph ? 'rich-math-inline-lead' : ''} ${className}`}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
 }
 
 export function QuestionFigures({

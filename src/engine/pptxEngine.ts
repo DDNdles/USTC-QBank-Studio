@@ -718,7 +718,7 @@ export async function generateSlidesForPaper(
     railMuted: stripHash(rawTheme.railMuted),
   }
   const assets = await loadVerbatimPptAssets()
-  const modeLabel = ({ mistake: '错题巩固', exam: '模拟测试', topic: '专题练习' } as Record<string, string>)[paper.mode] ?? '练习讲评'
+  const modeLabel = ({ exam: '模拟测试', topic: '专题练习' } as Record<string, string>)[paper.mode] ?? '练习讲评'
   const totalQuestions = paper.items.length
   const slides: GeneratedSlide[] = []
 
@@ -743,7 +743,7 @@ export async function generateSlidesForPaper(
   for (const [index, item] of paper.items.entries()) {
     const q = item.question
     const refShort = truncateText(q.source?.ref ?? '', 34)
-    const badge = item.is_original_redo ? '错题重做' : ''
+    const badge = ''
     const qType = typeLabel(q.type)
 
     const qBlocks: RichBlock[] = [{ text: q.stem.md, color: theme.body }]
@@ -872,7 +872,7 @@ export async function exportSlidesToPptx(
   const pptx = new PptxGenJS()
   pptx.layout = 'LAYOUT_WIDE'
   pptx.author = 'dsh-study'
-  pptx.subject = '课程讲评与错题复盘'
+  pptx.subject = '课程讲评课件'
   pptx.title = paper.title
   pptx.company = 'dsh-study'
   const inch = (px: number) => px / PX_PER_IN

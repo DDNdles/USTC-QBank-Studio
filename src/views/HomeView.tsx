@@ -4,6 +4,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { useStudy } from '../context/StudyContext'
 import { BrandLogo } from '../components/BrandLogo'
 import { RichMath } from '../components/RichMath'
+import { UstcBindingLine } from '../components/UstcBindingLine'
 
 const DISCIPLINES = [
   {
@@ -38,7 +39,6 @@ export function HomeView() {
     sources,
     questions,
     papers,
-    mistakes,
     setActiveTab,
     setBankCourseFilter,
     syncCourses,
@@ -253,42 +253,61 @@ export function HomeView() {
             onClick={() => setActiveTab('paper')}
             className="lg:col-span-8 cursor-pointer group"
           >
-            <div className="paper-sheet exam-paper-render relative rounded-md pl-14 sm:pl-16 pr-6 sm:pr-10 py-7 sm:py-9 transition-transform duration-500 group-hover:-translate-y-1">
-              <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-11 sm:w-12 border-r border-dashed border-neutral-400 flex items-center justify-center text-[9px] text-neutral-500">
-                <span style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
-                  装订线 · 答题时不要超过此线
-                </span>
-              </div>
-              <div className="text-center">
-                <div className="exam-header-title text-sm sm:text-[15px] font-bold">
-                  中国科学技术大学 2026--2027 学年第一学期
+            <div className="paper-sheet exam-paper-render relative rounded-sm overflow-hidden pl-[64px] sm:pl-[86px] pr-5 sm:pr-10 py-7 sm:py-9 transition-transform duration-500 group-hover:-translate-y-1">
+              <UstcBindingLine compact className="pointer-events-none select-none absolute left-0 top-0 h-full w-[58px] sm:w-[76px]" />
+              <div className="text-center text-black">
+                <div className="exam-heiti-bold text-[14.5px] sm:text-[16px]">
+                  中国科学技术大学2026–2027学年第一学期
                 </div>
-                <div className="exam-header-title text-sm sm:text-[15px] font-bold">
+                <div className="exam-heiti-bold text-[14.5px] sm:text-[16px] mt-0.5">
                   《数学分析(B1)》模拟试卷
+                </div>
+                <div className="mt-2 text-[11.5px] text-black">
+                  考试时间 <span className="inline-block min-w-[74px] border-b border-black px-2">2026.11.24</span>
+                  <span className="inline-block w-6" />
+                  考试形式 <span className="inline-block min-w-[74px] border-b border-black px-2">闭卷</span>
                 </div>
               </div>
               <table className="score-table !my-3.5 !text-[11px]">
                 <tbody>
                   <tr>
-                    <td><strong>题号</strong></td><td>一</td><td>二</td><td>三</td><td><strong>总分</strong></td>
+                    <td className="exam-heiti-bold">题号</td><td>一</td><td>二</td><td>三</td><td className="exam-heiti-bold">总分</td>
                   </tr>
                   <tr>
-                    <td><strong>满分</strong></td><td>30</td><td>30</td><td>40</td><td>100</td>
+                    <td className="exam-heiti-bold">满分</td><td>30</td><td>30</td><td>40</td><td>100</td>
+                  </tr>
+                  <tr>
+                    <td className="exam-heiti-bold">得分</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
                   </tr>
                 </tbody>
               </table>
-              <div className="text-[12.5px] sm:text-[13px] space-y-2 text-neutral-800">
-                <div className="exam-header-title font-bold">一.（共30分，每小题10分）计算与解答题</div>
+              <div className="text-[12.5px] sm:text-[13.5px] space-y-2.5 text-black">
                 <div>
-                  <span className="font-semibold">(1) </span>
-                  <RichMath
-                    text="求不定积分 $\displaystyle\int \left(1+\sqrt{x}\right)^{100}\mathrm{d}x$。"
-                    className="inline-block"
-                  />
+                  <span className="exam-heiti-bold">一.</span> (共30分，每小题10分) 计算与解答题
                 </div>
-                <div className="text-[#C01C28] text-[12px]">
-                  <strong>点评：</strong>
-                  <RichMath text="作换元 $u = 1+\sqrt{x}$ 化为多项式积分最为简洁。" className="inline-block" />
+                <div className="grid grid-cols-[2.2em_minmax(0,1fr)] items-baseline">
+                  <div>(1)</div>
+                  <div className="space-y-1.5">
+                    <div>
+                      <RichMath
+                        text="求不定积分 $\int (1+\sqrt{x})^{100}\dd x$。"
+                        displayMathInline
+                        inlineFirstParagraph
+                      />
+                    </div>
+                    <div>
+                      <span className="exam-heiti-bold mr-[0.9em]">解</span>
+                      <RichMath
+                        text="令 $u = 1+\sqrt{x}$，则 $x=(u-1)^2$，$\dd x = 2(u-1)\dd u$，从而原式 $= \frac{2}{102}u^{102}-\frac{2}{101}u^{101}+C$。"
+                        displayMathInline
+                        inlineFirstParagraph
+                      />
+                    </div>
+                    <div className="text-[#C01C28] text-[12px]">
+                      <span className="exam-heiti-bold">点评：</span>
+                      <RichMath text="作根式代换 $u = 1+\sqrt{x}$ 化为多项式积分最为简洁。" displayMathInline inlineFirstParagraph />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -371,13 +390,6 @@ export function HomeView() {
       {/* Minimal Single-Line Footer */}
       <footer className="pt-10 flex flex-wrap items-center justify-between gap-4 text-xs text-[var(--ink-muted)]">
         <div className="flex flex-wrap items-center gap-6">
-          <button
-            type="button"
-            onClick={() => setActiveTab('mistakes')}
-            className="hover:text-[var(--ink-primary)] cursor-pointer"
-          >
-            错题本 ({mistakes.length})
-          </button>
           <button
             type="button"
             onClick={() => setActiveTab('paper')}

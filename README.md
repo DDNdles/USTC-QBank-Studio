@@ -19,7 +19,7 @@
 </p>
 </div>
 
-面向 [DDNdles/USTC-Question-Bank](https://github.com/DDNdles/USTC-Question-Bank) 的**纯前端、零模型静态工作台**（GitHub Pages 托管），完整迁移 [dsh-study](https://github.com/DDNdles/dsh-study) 的非大模型能力——包括多源题库按需同步、层级知识点检索、条件/蓝图/自选/错题组卷、原版试卷与讲评 PPT 导出及 SM-2 错题复盘。
+面向 [DDNdles/USTC-Question-Bank](https://github.com/DDNdles/USTC-Question-Bank) 的**纯前端、零模型静态工作台**（GitHub Pages 托管），完整迁移 [dsh-study](https://github.com/DDNdles/dsh-study) 的非大模型能力——包括多源题库按需同步、层级知识点检索、条件/蓝图/自选组卷以及原版试卷与讲评 PPT 导出。
 
 - **在线访问**：[ddndles.github.io/USTC-QBank-Studio](https://ddndles.github.io/USTC-QBank-Studio/)
 
@@ -31,11 +31,10 @@
 
 | 模块 | 入口 | 核心能力 |
 | --- | --- | --- |
-| **题库浏览** | `#/bank` | 课程、层级知识点树（含递归计题）、题型、答案来源（`official` / `community` / `ai`）、难度、年份与全文检索；自选组卷篮、记错题、8 类题目纠错反馈（直推接口 + 预填 GitLab / GitHub Issue） |
-| **试卷工坊** | `#/paper` | 随机种子条件组卷、自定义大题蓝图、候选不足放宽提示；单题调序、改分、红字点评编辑与卷头定制；支持打印 PDF、独立 HTML 与 XeLaTeX 源码导出 |
+| **题库浏览** | `#/bank` | 课程、层级知识点树（含递归计题）、题型、答案来源（`official` / `community` / `ai`）、难度、年份与全文检索；自选组卷篮与 8 类题目纠错反馈（直推接口 + 预填 GitLab / GitHub Issue） |
+| **试卷工坊** | `#/paper` | 随机种子条件组卷、自定义大题蓝图、候选不足放宽提示；单题调序、改分、红字点评编辑与卷头定制；支持打印 PDF、独立 HTML、XeLaTeX 源码导出与 Overleaf 一键 XeLaTeX 编译 |
 | **讲评 PPT** | `#/ppt` | 原版 `review-classic` 16:9 课件实时预览、键盘全屏放映、演讲者备注查看与浏览器原生 `.pptx` 打包下载 |
-| **错题复盘** | `#/mistakes` | SM-2 间隔重复调度、今日待复习闪卡、手工 Markdown + LaTeX 录题、一键生成错题巩固卷（原题重做 + 同知识点拓展） |
-| **题库源** | `#/sources` | 多源目录刷新、按课程增量同步与 `SHA-256` 校验、CDN / 加速镜像配置、本地 v1.0 目录导入、试卷与错题 JSON 备份迁移 |
+| **题库源** | `#/sources` | 多源目录刷新、按课程增量同步与 `SHA-256` 校验、CDN / 加速镜像配置、本地 v1.0 目录导入、试卷与配置 JSON 备份迁移 |
 
 <img alt="02" src=".github/assets/route-02.svg" width="100%" />
 
@@ -79,9 +78,9 @@ USTC-QBank-Studio/
     ├── context/StudyContext.tsx  # 全局状态与 IndexedDB 桥接
     ├── db/storage.ts             # IndexedDB 持久化与 JSON 备份恢复
     ├── engine/                   # 组卷器、原版 LaTeX/HTML 渲染器、MathJax + PptxGenJS 引擎
-    ├── services/                 # 多源 SHA-256 同步、SM-2 错题调度、题目纠错反馈
+    ├── services/                 # 多源 SHA-256 同步、题目纠错反馈
     ├── templates/                # dsh-study 原版 ustc-exam / gaokao / review-classic 模板
-    └── views/                    # 总览 / 题库 / 出卷 / PPT / 错题 / 题库源
+    └── views/                    # 总览 / 题库 / 出卷 / PPT / 题库源
 ```
 
 ```bash

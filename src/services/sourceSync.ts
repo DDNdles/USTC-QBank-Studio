@@ -106,7 +106,7 @@ export async function refreshSourceManifest(
   source: SourceConfig,
   signal?: AbortSignal,
 ): Promise<SourceConfig> {
-  if (source.transport === 'personal' || source.transport === 'local-import') return source
+  if (source.transport === 'local-import') return source
   const urls = buildCandidateUrls(source, 'manifest.json')
   const buf = await fetchWithFallback(urls, signal)
   const text = new TextDecoder('utf-8').decode(buf)

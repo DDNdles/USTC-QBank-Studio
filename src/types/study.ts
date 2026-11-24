@@ -1,12 +1,10 @@
 export type AnswerOrigin = 'official' | 'community' | 'ai'
 export type QuestionType = 'single' | 'multi' | 'blank' | 'solve' | 'proof'
-export type MistakeStatus = 'unmastered' | 'reviewing' | 'mastered'
-export type ReviewRating = 'again' | 'hard' | 'good' | 'easy'
-export type PaperMode = 'exam' | 'topic' | 'mistake'
+export type PaperMode = 'exam' | 'topic'
 export type PdfTemplateId = 'ustc-exam' | 'gaokao'
 export type PdfExportMode = 'inline-solution' | 'split'
 export type WriteSpaceSize = 'compact' | 'standard' | 'spacious'
-export type NavTab = 'home' | 'bank' | 'paper' | 'ppt' | 'mistakes' | 'sources'
+export type NavTab = 'home' | 'bank' | 'paper' | 'ppt' | 'sources'
 
 export interface FigureRef {
   path: string
@@ -69,7 +67,7 @@ export interface QuestionRecord {
 
 export interface StoredQuestion extends QuestionRecord {
   source_id: string
-  key: string // `${source_id}\0${id}`
+  key: string
   search_text: string
 }
 
@@ -82,7 +80,7 @@ export interface TaxonomyNode {
 }
 
 export interface StoredTaxonomy {
-  key: string // `${source_id}\0${course_code}`
+  key: string
   source_id: string
   course_code: string
   nodes: TaxonomyNode[]
@@ -135,7 +133,7 @@ export interface BankManifest {
 export interface SourceConfig {
   source_id: string
   name: string
-  transport: 'github-raw' | 'http-manifest' | 'local-import' | 'personal'
+  transport: 'github-raw' | 'http-manifest' | 'local-import'
   location: string
   ref?: string | null
   mirror_url?: string | null
@@ -187,27 +185,6 @@ export interface SavedPaper {
   header_meta: Partial<PaperHeaderMeta>
   config: Record<string, unknown>
   items: PaperItem[]
-  created_at: string
-  updated_at: string
-}
-
-export interface MistakeRecord {
-  mistake_id: string
-  source_id: string
-  course_code: string
-  question_id: string
-  status: MistakeStatus
-  wrong_count: number
-  review_count: number
-  ease_factor: number
-  interval_days: number
-  next_review_at: string
-  last_wrong_at: string
-  last_reviewed_at: string | null
-  error_tags: string[]
-  wrong_attempt_md: string
-  reflection_md: string
-  question: QuestionRecord
   created_at: string
   updated_at: string
 }

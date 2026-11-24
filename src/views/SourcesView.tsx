@@ -192,9 +192,7 @@ export function SourcesView() {
 
       {/* Source Tabs */}
       <div className="flex flex-wrap items-center gap-2">
-        {sources
-          .filter(s => s.transport !== 'personal')
-          .map(src => {
+        {sources.map(src => {
             const active = src.source_id === activeSource?.source_id
             const installedNum = Object.keys(src.installed_courses ?? {}).length
             return (

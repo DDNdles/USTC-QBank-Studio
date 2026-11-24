@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, Database, FileText, Presentation, RotateCcw, Search, ArrowRight } from 'lucide-react'
+import { BookOpen, Database, FileText, Presentation, Search, ArrowRight } from 'lucide-react'
 import { useStudy } from '../context/StudyContext'
 
 export function CommandPalette({
@@ -49,7 +49,6 @@ export function CommandPalette({
   const quickActions = [
     { label: '前往快速出卷工坊（中科大 / 高考版式）', icon: FileText, run: () => setActiveTab('paper') },
     { label: '前往讲评 PPT 放映与导出', icon: Presentation, run: () => setActiveTab('ppt') },
-    { label: '前往错题本与 SM-2 复习', icon: RotateCcw, run: () => setActiveTab('mistakes') },
     { label: '管理题库源与同步课程', icon: Database, run: () => setActiveTab('sources') },
   ]
 

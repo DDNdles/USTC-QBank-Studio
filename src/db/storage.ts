@@ -1,14 +1,13 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
 import type {
+  BankManifest,
   FeedbackRecord,
-  MistakeRecord,
   SavedPaper,
   SourceConfig,
   StoredQuestion,
   StoredTaxonomy,
 } from '../types/study'
 import fallbackManifest from '../data/fallback-manifest.json'
-import type { BankManifest } from '../types/study'
 
 interface StudyStudioDB extends DBSchema {
   sources: {
@@ -35,19 +34,12 @@ interface StudyStudioDB extends DBSchema {
     key: string
     value: SavedPaper
   }
-  mistakes: {
-    key: string
-    value: MistakeRecord
-    indexes: {
-      'by-question': [string, string]
-    }
-  }
   feedback: {
     key: string
     value: FeedbackRecord
   }
   local_assets: {
-    key: string // `${source_id}\0${course_code}\0${relPath}`
+    key: string
     value: {
       key: string
       blob: Blob
@@ -81,10 +73,6 @@ export function getDb(): Promise<IDBPDatabase<StudyStudioDB>> {
         if (!db.objectStoreNames.contains('papers')) {
           db.createObjectStore('papers', { keyPath: 'paper_id' })
         }
-        if (!db.objectStoreNames.contains('mistakes')) {
-          const ms = db.createObjectStore('mistakes', { keyPath: 'mistake_id' })
-          ms.createIndex('by-question', ['source_id', 'question_id'])
-        }
         if (!db.objectStoreNames.contains('feedback')) {
           db.createObjectStore('feedback', { keyPath: 'feedback_id' })
         }
@@ -110,19 +98,11 @@ export const DEFAULT_SOURCES: SourceConfig[] = [
     installed_courses: {},
     builtin: true,
   },
-  {
-    source_id: 'local-personal',
-    name: '个人自录错题库',
-    transport: 'personal',
-    location: 'browser-indexeddb://personal',
-    installed_courses: {},
-    builtin: true,
-  },
 ]
 
 export async function ensureBuiltinSources(): Promise<SourceConfig[]> {
   const db = await getDb()
-  const existing = await db.getAll('sources')
+  const existing = (await db.getAll('sources')).filter(s => s.source_id !== 'local-personal')
   const byId = new Map(existing.map(s => [s.source_id, s]))
 
   for (const def of DEFAULT_SOURCES) {
@@ -214,26 +194,9 @@ export async function listAllQuestions(): Promise<StoredQuestion[]> {
   return db.getAll('questions')
 }
 
-export async function listQuestionsByCourse(courseCodes: string[]): Promise<StoredQuestion[]> {
-  const db = await getDb()
-  if (!courseCodes.length) return db.getAll('questions')
-  const out: StoredQuestion[] = []
-  const idx = db.transaction('questions').store.index('by-course-code')
-  for (const code of courseCodes) {
-    const rows = await idx.getAll(code)
-    out.push(...rows)
-  }
-  return out
-}
-
 export async function listAllTaxonomies(): Promise<StoredTaxonomy[]> {
   const db = await getDb()
   return db.getAll('taxonomies')
-}
-
-export async function putQuestion(q: StoredQuestion): Promise<void> {
-  const db = await getDb()
-  await db.put('questions', q)
 }
 
 export async function listPapers(): Promise<SavedPaper[]> {
@@ -250,22 +213,6 @@ export async function savePaper(paper: SavedPaper): Promise<void> {
 export async function deletePaper(paperId: string): Promise<void> {
   const db = await getDb()
   await db.delete('papers', paperId)
-}
-
-export async function listMistakes(): Promise<MistakeRecord[]> {
-  const db = await getDb()
-  const rows = await db.getAll('mistakes')
-  return rows.sort((a, b) => a.next_review_at.localeCompare(b.next_review_at) || b.wrong_count - a.wrong_count)
-}
-
-export async function saveMistake(mistake: MistakeRecord): Promise<void> {
-  const db = await getDb()
-  await db.put('mistakes', mistake)
-}
-
-export async function deleteMistake(mistakeId: string): Promise<void> {
-  const db = await getDb()
-  await db.delete('mistakes', mistakeId)
 }
 
 export async function listFeedback(): Promise<FeedbackRecord[]> {
@@ -297,17 +244,12 @@ export async function getLocalAssetUrl(sourceId: string, courseCode: string, rel
 
 export async function exportWorkspaceBackup(): Promise<string> {
   const db = await getDb()
-  const [papers, mistakes, feedback] = await Promise.all([
-    db.getAll('papers'),
-    db.getAll('mistakes'),
-    db.getAll('feedback'),
-  ])
+  const [papers, feedback] = await Promise.all([db.getAll('papers'), db.getAll('feedback')])
   return JSON.stringify(
     {
       schema: 'ustc-qbank-studio-backup/1.0',
       exported_at: new Date().toISOString(),
       papers,
-      mistakes,
       feedback,
     },
     null,
@@ -315,12 +257,11 @@ export async function exportWorkspaceBackup(): Promise<string> {
   )
 }
 
-export async function importWorkspaceBackup(jsonText: string): Promise<{ papers: number; mistakes: number }> {
+export async function importWorkspaceBackup(jsonText: string): Promise<{ papers: number }> {
   const parsed = JSON.parse(jsonText)
   if (!parsed || typeof parsed !== 'object') throw new Error('备份文件格式无效')
   const db = await getDb()
   let papersCount = 0
-  let mistakesCount = 0
   if (Array.isArray(parsed.papers)) {
     for (const p of parsed.papers) {
       if (p?.paper_id && Array.isArray(p.items)) {
@@ -329,13 +270,5 @@ export async function importWorkspaceBackup(jsonText: string): Promise<{ papers:
       }
     }
   }
-  if (Array.isArray(parsed.mistakes)) {
-    for (const m of parsed.mistakes) {
-      if (m?.mistake_id && m.question) {
-        await db.put('mistakes', m)
-        mistakesCount++
-      }
-    }
-  }
-  return { papers: papersCount, mistakes: mistakesCount }
+  return { papers: papersCount }
 }

@@ -154,6 +154,12 @@
 .rich-math p:last-child {
   margin-bottom: 0;
 }
+.rich-math-inline-lead {
+  display: inline;
+}
+.rich-math-inline-lead > p:first-child {
+  display: inline;
+}
 .rich-math table {
   border-collapse: collapse;
   margin: 0.75em auto;
@@ -166,29 +172,32 @@
   text-align: center;
 }
 
-/* Exam sheet preview styles (always light paper like a real printed sheet) */
+/* Exam sheet preview styles (always pure white A4 paper matching dsh-study XeLaTeX output) */
 .exam-paper-render {
-  font-family: "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
-  color: #14161A;
-  line-height: 1.85;
+  font-family: "SimSun", "Songti SC", "Noto Serif CJK SC", "STSong", Georgia, serif;
+  color: #000000;
+  line-height: 1.75;
 }
-.exam-paper-render .exam-header-title {
-  font-family: "Noto Sans SC", "Microsoft YaHei", "SimHei", sans-serif;
+.exam-paper-render .exam-header-title,
+.exam-paper-render .exam-heiti-bold {
+  font-family: "SimHei", "Heiti SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  font-weight: 700;
 }
 .exam-paper-render table.score-table {
   border-collapse: collapse;
   margin: 14px auto 22px;
   font-size: 13.5px;
+  color: #000000;
 }
 .exam-paper-render table.score-table td {
-  border: 1px solid #374151;
-  padding: 5px 14px;
+  border: 1px solid #000000;
+  padding: 6px 15px;
   text-align: center;
-  min-width: 34px;
+  min-width: 38px;
 }
 .exam-paper-render .rich-math th,
 .exam-paper-render .rich-math td {
-  border-color: #4b5563;
+  border-color: #000000;
 }
 
 /* Print mode: hide app chrome, print clean A4 sheet */

@@ -6,7 +6,6 @@ import {
   FileText,
   Moon,
   Presentation,
-  RotateCcw,
   Search,
   ShoppingBag,
   Sun,
@@ -27,7 +26,6 @@ const DESKTOP_TABS: NavItem[] = [
   { id: 'bank', label: '题库', shortLabel: '题库', icon: BookOpen },
   { id: 'paper', label: '出卷', shortLabel: '出卷', icon: FileText },
   { id: 'ppt', label: 'PPT', shortLabel: 'PPT', icon: Presentation },
-  { id: 'mistakes', label: '错题', shortLabel: '错题', icon: RotateCcw },
   { id: 'sources', label: '题库源', shortLabel: '同步', icon: Database },
 ]
 
@@ -36,7 +34,7 @@ const MOBILE_DOCK_TABS: NavItem[] = [
   { id: 'bank', label: '题库', shortLabel: '题库', icon: BookOpen },
   { id: 'paper', label: '出卷', shortLabel: '出卷', icon: FileText },
   { id: 'ppt', label: 'PPT', shortLabel: 'PPT', icon: Presentation },
-  { id: 'mistakes', label: '错题', shortLabel: '错题', icon: RotateCcw },
+  { id: 'sources', label: '题库源', shortLabel: '同步', icon: Database },
 ]
 
 export function NavigationShell({
@@ -50,7 +48,6 @@ export function NavigationShell({
     theme,
     toggleTheme,
     cartKeys,
-    dueMistakeCount,
     syncing,
     syncProgress,
   } = useStudy()
@@ -94,9 +91,6 @@ export function NavigationShell({
                   }`}
                 >
                   <span>{tab.label}</span>
-                  {tab.id === 'mistakes' && dueMistakeCount > 0 && (
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--amber)]" />
-                  )}
                   {active && (
                     <motion.span
                       layoutId="desktop-nav-underline"
@@ -133,19 +127,6 @@ export function NavigationShell({
             >
               <Search className="h-3.5 w-3.5" />
               <kbd className="font-mono-num text-[11px] opacity-75">⌘K</kbd>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('sources')}
-              aria-label="题库源与同步"
-              className={`md:hidden flex h-8 w-8 items-center justify-center rounded-full transition-colors cursor-pointer ${
-                activeTab === 'sources'
-                  ? 'text-[var(--accent)] bg-[var(--accent-soft)]'
-                  : 'text-[var(--ink-secondary)] hover:bg-[var(--bg-subtle)]'
-              }`}
-            >
-              <Database className="h-4 w-4" />
             </button>
 
             <button
@@ -250,11 +231,6 @@ export function NavigationShell({
                   }`}
                 >
                   <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.1 : 1.7} />
-                  {tab.id === 'mistakes' && dueMistakeCount > 0 && (
-                    <span className="absolute -right-2 -top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[var(--amber)] px-1 text-[9px] font-bold text-white font-mono-num">
-                      {dueMistakeCount > 9 ? '9+' : dueMistakeCount}
-                    </span>
-                  )}
                   {tab.id === 'bank' && cartKeys.length > 0 && (
                     <span className="absolute -right-2 -top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[var(--accent)] px-1 text-[9px] font-bold text-white font-mono-num">
                       {cartKeys.length}

@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  BookmarkPlus,
   Check,
   ChevronDown,
   ChevronUp,
@@ -45,7 +44,6 @@ export function BankView({
     toggleCartKey,
     clearCart,
     persistPaper,
-    markMistake,
     setActiveTab,
     bankCourseFilter,
     setBankCourseFilter,
@@ -394,16 +392,6 @@ export function BankView({
                       >
                         {inCart ? <Check className="h-3 w-3" /> : <ShoppingBag className="h-3 w-3" />}
                         {inCart ? '已选入篮' : '加入组卷篮'}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => void markMistake({ source_id: q.source_id, question: q })}
-                        className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-canvas)] px-2.5 py-1 text-[11.5px] text-[var(--ink-secondary)] hover:text-[var(--amber)] hover:border-[var(--amber)]/40 cursor-pointer"
-                        title="加入 SM-2 错题本"
-                      >
-                        <BookmarkPlus className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">记错题</span>
                       </button>
 
                       <button

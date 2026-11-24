@@ -13,7 +13,7 @@
     <path d="M17.2 17.2L20.1 17.2L27.8 24.9L24.9 27.8L17.2 20.1Z" fill="#5B95F0"/>
   </g>
   <text x="56" y="148" font-family="Inter, 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif" font-size="52" font-weight="700" letter-spacing="-1.2" fill="#ECEEF1">USTC-QBank-Studio</text>
-  <text x="56" y="192" font-family="'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="20" font-weight="500" fill="#C9CDD3">中科大公开题库 · 零模型出卷、讲评 PPT 与错题复盘工作台</text>
+  <text x="56" y="192" font-family="'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="20" font-weight="500" fill="#C9CDD3">中科大公开题库 · 零模型出卷与讲评 PPT 静态工作台</text>
   <line x1="56" y1="242" x2="112" y2="242" stroke="#5B95F0" stroke-width="2"/>
   <circle cx="122" cy="242" r="7.5" fill="#11161D" stroke="#5B95F0" stroke-width="1.8"/>
   <circle cx="122" cy="242" r="3.2" fill="#5B95F0"/>
@@ -21,5 +21,5 @@
   <circle cx="242" cy="242" r="3.5" fill="#11161D" stroke="#454E5B" stroke-width="1.4"/>
   <circle cx="352" cy="242" r="3.5" fill="#11161D" stroke="#454E5B" stroke-width="1.4"/>
   <circle cx="464" cy="242" r="3.5" fill="#11161D" stroke="#454E5B" stroke-width="1.4"/>
-  <text x="56" y="274" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, monospace" font-size="12" fill="#7D848D">ustc-exam / gaokao / review-classic / IndexedDB + SHA-256 / SM-2</text>
+  <text x="56" y="274" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, monospace" font-size="12" fill="#7D848D">ustc-exam / gaokao / review-classic / IndexedDB + SHA-256</text>
 </svg>
