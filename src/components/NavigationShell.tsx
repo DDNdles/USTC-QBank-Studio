@@ -45,7 +45,6 @@ export function NavigationShell({
   const {
     activeTab,
     setActiveTab,
-    theme,
     toggleTheme,
     cartKeys,
     syncing,
@@ -135,29 +134,14 @@ export function NavigationShell({
               aria-label="切换明暗主题"
               className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] hover:bg-[var(--bg-subtle)] transition-colors cursor-pointer"
             >
-              <AnimatePresence mode="wait" initial={false}>
-                {theme === 'light' ? (
-                  <motion.span
-                    key="moon"
-                    initial={{ rotate: -20, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 20, opacity: 0 }}
-                    transition={{ duration: 0.16 }}
-                  >
-                    <Moon className="h-[15px] w-[15px]" strokeWidth={1.75} />
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="sun"
-                    initial={{ rotate: 20, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -20, opacity: 0 }}
-                    transition={{ duration: 0.16 }}
-                  >
-                    <Sun className="h-[15px] w-[15px]" strokeWidth={1.75} />
-                  </motion.span>
-                )}
-              </AnimatePresence>
+              <span className="theme-btn-ic">
+                <span className="glyph glyph-sun">
+                  <Sun className="h-[15px] w-[15px]" strokeWidth={1.75} />
+                </span>
+                <span className="glyph glyph-moon">
+                  <Moon className="h-[15px] w-[15px]" strokeWidth={1.75} />
+                </span>
+              </span>
             </button>
           </div>
         </div>

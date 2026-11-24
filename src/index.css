@@ -236,3 +236,57 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Theme toggle View Transition: circular reveal from icon center + independent rotating icon swap */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
+  clip-path: circle(0px at var(--vt-cx, 50%) var(--vt-cy, 50%));
+  animation: vt-reveal 0.5s cubic-bezier(0.215, 0.61, 0.355, 1) both;
+}
+@keyframes vt-reveal {
+  to {
+    clip-path: circle(var(--vt-max-r, 150vmax) at var(--vt-cx, 50%) var(--vt-cy, 50%));
+  }
+}
+
+.theme-btn-ic {
+  view-transition-name: theme-icon;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+::view-transition-old(theme-icon) {
+  animation: theme-icon-out 0.45s cubic-bezier(0, 0, 0.2, 1) both;
+}
+::view-transition-new(theme-icon) {
+  animation: theme-icon-in 0.45s cubic-bezier(0, 0, 0.2, 1) both;
+}
+@keyframes theme-icon-out {
+  to {
+    transform: rotate(150deg) scale(0.3);
+    opacity: 0;
+  }
+}
+@keyframes theme-icon-in {
+  from {
+    transform: rotate(-150deg) scale(0.35);
+    opacity: 0.1;
+  }
+}
+
+/* Dual-glyph CSS toggle so data-theme flip swaps icons with zero React render during VT */
+.glyph {
+  display: inline-flex;
+}
+[data-theme="dark"] .glyph-moon,
+[data-theme="light"] .glyph-sun {
+  display: none;
+}

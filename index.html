@@ -8,6 +8,19 @@
     <title>USTC QBank Studio · 科大题卷工坊</title>
     <meta name="description" content="纯前端、零模型的中科大题库工作台：按需同步课程、智能组卷、中科大/高考标准试卷与 LaTeX 导出、经典讲评 PPTX 制作。" />
     <link rel="icon" type="image/png" href="./images/brand-logo.png" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('ustc-studio-theme');
+          var next = saved === 'dark' || saved === 'light'
+            ? saved
+            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.dataset.theme = next;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />

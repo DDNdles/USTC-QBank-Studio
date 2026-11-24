@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import {
   deletePaper,
   deleteSource,
@@ -107,10 +107,13 @@ export function StudyProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false)
   const [activeTab, setActiveTabState] = useState<NavTab>(() => readTabFromHash())
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const attr = document.documentElement.dataset.theme
+    if (attr === 'dark' || attr === 'light') return attr
     const saved = localStorage.getItem('ustc-studio-theme')
     if (saved === 'dark' || saved === 'light') return saved
     return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   })
+  const switchingThemeRef = useRef(false)
 
   const [sources, setSources] = useState<SourceConfig[]>([])
   const [questions, setQuestions] = useState<StoredQuestion[]>([])
@@ -147,13 +150,61 @@ export function StudyProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    localStorage.setItem('ustc-studio-theme', theme)
+    if (!switchingThemeRef.current) {
+      document.documentElement.dataset.theme = theme
+      localStorage.setItem('ustc-studio-theme', theme)
+    }
   }, [theme])
 
   const toggleTheme = useCallback(() => {
-    setTheme(cur => (cur === 'light' ? 'dark' : 'light'))
-  }, [])
+    const root = document.documentElement
+    const current = (root.dataset.theme === 'dark' || root.dataset.theme === 'light'
+      ? root.dataset.theme
+      : theme) as 'light' | 'dark'
+    const next: 'light' | 'dark' = current === 'light' ? 'dark' : 'light'
+
+    const doc = document as Document & {
+      startViewTransition?: (cb: () => void) => { ready: Promise<void>; finished: Promise<void> }
+    }
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
+    if (!doc.startViewTransition || reduced || switchingThemeRef.current) {
+      root.dataset.theme = next
+      localStorage.setItem('ustc-studio-theme', next)
+      setTheme(next)
+      return
+    }
+
+    switchingThemeRef.current = true
+
+    // Measure icon center & farthest viewport corner once; CSS keyframes drive 100% of frames on GPU
+    const iconEl = document.querySelector('.theme-btn-ic')
+    const rect = iconEl?.getBoundingClientRect()
+    const cx = rect ? rect.left + rect.width / 2 : window.innerWidth / 2
+    const cy = rect ? rect.top + rect.height / 2 : window.innerHeight / 2
+    const maxR = Math.hypot(
+      Math.max(cx, window.innerWidth - cx),
+      Math.max(cy, window.innerHeight - cy),
+    )
+    root.style.setProperty('--vt-cx', `${cx.toFixed(1)}px`)
+    root.style.setProperty('--vt-cy', `${cy.toFixed(1)}px`)
+    root.style.setProperty('--vt-max-r', `${maxR.toFixed(1)}px`)
+
+    // DOM-only mutation inside VT callback (zero React render during snapshot capture)
+    const vt = doc.startViewTransition(() => {
+      root.dataset.theme = next
+      localStorage.setItem('ustc-studio-theme', next)
+    })
+
+    vt.finished
+      .finally(() => {
+        switchingThemeRef.current = false
+        setTheme(next)
+      })
+      .catch(() => {
+        switchingThemeRef.current = false
+      })
+  }, [theme])
 
   const reloadAll = useCallback(async () => {
     const [srcs, qs, txs, pps, fbs] = await Promise.all([
