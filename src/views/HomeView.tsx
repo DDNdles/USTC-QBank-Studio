@@ -22,7 +22,7 @@ const DISCIPLINES = [
   {
     id: 'cs-ee',
     label: '信息与工程',
-    image: './images/subject-cs.svg',
+    image: './images/subject-cs.jpg',
     match: (code: string, dept: string) =>
       !dept.includes('数学') &&
       !dept.includes('物理') &&
