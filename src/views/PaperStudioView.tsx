@@ -202,16 +202,13 @@ export function PaperStudioView() {
         <div className="mx-auto w-56 overflow-hidden rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] p-2 shadow-sm">
           <img src="./images/study-vignette.svg" alt="等待同步题库" className="aspect-[4/3] w-full rounded-xl object-cover" />
         </div>
-        <h2 className="font-editorial text-2xl font-semibold">同步课程后即可零模型直出标准试卷</h2>
-        <p className="text-sm text-[var(--ink-secondary)]">
-          支持中科大标准考试卷（奇数页装订线 + 动态得分表）、全国高考版式、独立可打印 HTML 与 XeLaTeX 源码导出。
-        </p>
+        <h2 className="font-editorial text-2xl font-medium">尚未同步课程</h2>
         <button
           type="button"
           onClick={() => setActiveTab('sources')}
-          className="inline-flex items-center gap-2 rounded-full bg-[var(--ink-primary)] px-6 py-2.5 text-sm font-medium text-[var(--bg-paper)] cursor-pointer"
+          className="inline-flex items-center gap-2 rounded-md bg-[var(--ink-primary)] px-5 py-2 text-xs font-medium text-[var(--bg-paper)] cursor-pointer"
         >
-          <Database className="h-4 w-4" /> 前往题库源同步课程
+          <Database className="h-3.5 w-3.5" /> 同步课程
         </button>
       </div>
     )

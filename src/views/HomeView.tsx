@@ -10,7 +10,6 @@ const DISCIPLINES = [
     id: 'math',
     label: '数学科学',
     image: './images/subject-math.jpg',
-    caption: '数学分析 · 线性代数 · 复变函数 · 概率统计',
     match: (code: string, dept: string) =>
       dept.includes('数学') || code.startsWith('MATH') || code.startsWith('STAT') || code === '001548',
   },
@@ -18,14 +17,12 @@ const DISCIPLINES = [
     id: 'physics',
     label: '物理科学',
     image: './images/subject-physics.svg',
-    caption: '力学 · 热学 · 电磁学 · 光学',
     match: (code: string, dept: string) => dept.includes('物理') || code.startsWith('PHYS'),
   },
   {
     id: 'cs-ee',
     label: '信息与工程',
     image: './images/subject-cs.svg',
-    caption: '程序设计 · 计算机原理与嵌入式 · 电路与信号',
     match: (code: string, dept: string) =>
       !dept.includes('数学') &&
       !dept.includes('物理') &&
@@ -71,27 +68,23 @@ export function HomeView() {
 
   return (
     <div className="mx-auto max-w-[1080px] px-5 sm:px-8 pb-32 md:pb-24">
-      {/* Typora-Style Centered Monograph Opening — pure typography & negative space */}
+      {/* Typora-Style Centered Opening — zero descriptive sub-copy */}
       <section className="pt-14 sm:pt-24 pb-12 sm:pb-16 text-center">
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto max-w-[660px] space-y-5"
+          className="mx-auto max-w-[660px] space-y-6"
         >
           <div className="flex justify-center">
-            <BrandLogo size={46} />
+            <BrandLogo size={42} />
           </div>
 
-          <h1 className="font-editorial text-4xl sm:text-[54px] font-medium tracking-[-0.025em] leading-[1.12] text-[var(--ink-primary)]">
+          <h1 className="font-editorial text-4xl sm:text-[56px] font-medium tracking-[-0.025em] leading-[1.1] text-[var(--ink-primary)]">
             USTC QBank Studio
           </h1>
 
-          <p className="text-[15.5px] sm:text-[17px] leading-[1.75] text-[var(--ink-secondary)]">
-            中科大公开题库的离线检索、标准试卷排版与讲评课件工作台。
-          </p>
-
-          <div className="flex items-center justify-center gap-6 pt-3">
+          <div className="flex items-center justify-center gap-6 pt-1">
             <motion.button
               whileTap={{ scale: 0.98 }}
               type="button"
@@ -111,66 +104,54 @@ export function HomeView() {
           </div>
         </motion.div>
 
-        {/* Full-Width Unobstructed Print Plate (no overlay pills!) */}
+        {/* Unobstructed Full-Width Print Plate */}
         <motion.figure
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.72, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.72, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
           className="mt-12 sm:mt-16"
         >
           <div className="overflow-hidden rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-paper)] shadow-[var(--shadow-sheet)]">
             <img
               src="./images/hero-atelier.jpg"
-              alt="USTC QBank Studio 纸面排版桌面"
+              alt="USTC QBank Studio"
               className="w-full aspect-[16/9] object-cover block"
             />
           </div>
           <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11.5px] font-mono-num text-[var(--ink-muted)]">
-            <span>DDNdles/USTC-Question-Bank · v{official?.data_version ?? '0.11.0'}</span>
+            <span>USTC-Question-Bank · v{official?.data_version ?? '0.11.0'}</span>
             <span>
-              {manifestCourses.length} 门课程 · {totalCatalogQuestions.toLocaleString()} 题 · 本机已缓存 {questions.length.toLocaleString()} 题
+              {manifestCourses.length} 门课程 · {totalCatalogQuestions.toLocaleString()} 题
             </span>
           </figcaption>
         </motion.figure>
       </section>
 
-      {/* Hairline Rule */}
       <hr className="border-0 border-t border-[var(--border-hairline)]" />
 
-      {/* Section 1: Asymmetric Swiss Editorial Discipline Index (zero card grid!) */}
+      {/* Section 1: Asymmetric Swiss Discipline Index */}
       <section className="py-16 sm:py-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
         <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-5">
           <h2 className="font-editorial text-2xl sm:text-[30px] font-medium tracking-tight text-[var(--ink-primary)]">
             学科与课程
           </h2>
-          <p className="text-sm leading-relaxed text-[var(--ink-secondary)]">
-            点选任意课程即可按需同步至本机 IndexedDB，支持离线检索与知识点树筛选。
-          </p>
 
-          {/* Interactive Fine-Art Plate Cross-Fade */}
-          <figure className="pt-2">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)]">
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={activeDiscipline.id}
-                  src={activeDiscipline.image}
-                  alt={activeDiscipline.label}
-                  initial={{ opacity: 0, scale: 1.02 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35, ease: 'easeOut' }}
-                  className="h-full w-full object-cover"
-                />
-              </AnimatePresence>
-            </div>
-            <figcaption className="mt-2.5 flex items-center justify-between text-[11.5px] text-[var(--ink-muted)]">
-              <span>{activeDiscipline.label}</span>
-              <span>{activeDiscipline.caption}</span>
-            </figcaption>
-          </figure>
+          <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)]">
+            <AnimatePresence mode="wait">
+              <motion.img
+                key={activeDiscipline.id}
+                src={activeDiscipline.image}
+                alt={activeDiscipline.label}
+                initial={{ opacity: 0, scale: 1.02 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="h-full w-full object-cover"
+              />
+            </AnimatePresence>
+          </div>
         </div>
 
-        {/* Clean Ruled Course Index */}
         <div className="lg:col-span-7 divide-y divide-[var(--border-hairline)] border-t border-b border-[var(--border-hairline)]">
           {DISCIPLINES.map(disc => {
             const matched = manifestCourses.filter(c => disc.match(c.code, c.department))
@@ -182,14 +163,14 @@ export function HomeView() {
                 key={disc.id}
                 onMouseEnter={() => setActiveDisciplineId(disc.id)}
                 onClick={() => setActiveDisciplineId(disc.id)}
-                className={`py-7 transition-colors ${isActive ? '' : 'opacity-80 hover:opacity-100'}`}
+                className={`py-7 transition-opacity ${isActive ? 'opacity-100' : 'opacity-75 hover:opacity-100'}`}
               >
                 <div className="flex items-baseline justify-between gap-4 mb-4">
                   <h3 className="font-editorial text-xl font-medium text-[var(--ink-primary)]">
                     {disc.label}
                   </h3>
                   <span className="font-mono-num text-xs text-[var(--ink-muted)]">
-                    {matched.length} 门 · {qSum.toLocaleString()} 题
+                    {matched.length} · {qSum.toLocaleString()}
                   </span>
                 </div>
 
@@ -206,7 +187,6 @@ export function HomeView() {
                           void handleOpenCourse(course.code)
                         }}
                         className="group inline-flex items-baseline gap-1.5 text-left text-[13.5px] text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors cursor-pointer disabled:opacity-45"
-                        title={cached ? '已离线缓存，点击浏览' : `点击同步 ${course.name} (${course.total} 题)`}
                       >
                         <span
                           className={`inline-block h-1.5 w-1.5 rounded-full self-center ${
@@ -227,14 +207,13 @@ export function HomeView() {
             )
           })}
 
-          <div className="py-5 flex items-center justify-between text-xs text-[var(--ink-muted)]">
-            <span>绿点表示已离线缓存至本机</span>
+          <div className="py-5 flex items-center justify-end text-xs">
             <button
               type="button"
               onClick={() => setActiveTab('sources')}
               className="inline-flex items-center gap-1 text-[var(--ink-primary)] hover:text-[var(--accent)] cursor-pointer"
             >
-              管理题库源与批量同步 <ArrowUpRight className="h-3.5 w-3.5" />
+              管理题库源 <ArrowUpRight className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
@@ -242,8 +221,8 @@ export function HomeView() {
 
       <hr className="border-0 border-t border-[var(--border-hairline)]" />
 
-      {/* Section 2: Let the Verbatim dsh-study Templates Speak (Typora-style Live Specimens) */}
-      <section className="py-16 sm:py-24 space-y-16">
+      {/* Section 2: Live Verbatim Specimens — let the templates speak directly */}
+      <section className="py-16 sm:py-24 space-y-20">
         {/* Specimen A: Verbatim ustc-exam Sheet */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}
@@ -252,32 +231,29 @@ export function HomeView() {
           transition={{ duration: 0.55 }}
           className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center"
         >
-          <div className="lg:col-span-5 space-y-3">
+          <div className="lg:col-span-4 space-y-3">
             <h2 className="font-editorial text-2xl sm:text-[28px] font-medium text-[var(--ink-primary)]">
-              中科大与高考标准试卷
+              标准试卷
             </h2>
-            <p className="text-sm leading-[1.8] text-[var(--ink-secondary)]">
-              完整沿用 <code className="font-mono-num text-xs">dsh-study</code> 原版{' '}
-              <code className="font-mono-num text-xs">ustc-exam</code> 与{' '}
-              <code className="font-mono-num text-xs">gaokao</code> 模板：奇数页密封装订线、动态得分表、黑体解与证明、红字点评。支持打印 PDF、独立 HTML 与 XeLaTeX 源码。
-            </p>
+            <div className="font-mono-num text-xs text-[var(--ink-muted)]">
+              ustc-exam · gaokao · PDF / HTML / TeX
+            </div>
             <div className="pt-2">
               <button
                 type="button"
                 onClick={() => setActiveTab('paper')}
                 className="inline-flex items-center gap-1 text-[13.5px] font-medium text-[var(--ink-primary)] underline decoration-[var(--border-strong)] underline-offset-[6px] hover:decoration-[var(--ink-primary)] cursor-pointer"
               >
-                打开试卷工坊 <ArrowUpRight className="h-3.5 w-3.5" />
+                出卷 <ArrowUpRight className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
 
           <div
             onClick={() => setActiveTab('paper')}
-            className="lg:col-span-7 cursor-pointer group"
+            className="lg:col-span-8 cursor-pointer group"
           >
             <div className="paper-sheet exam-paper-render relative rounded-md pl-14 sm:pl-16 pr-6 sm:pr-10 py-7 sm:py-9 transition-transform duration-500 group-hover:-translate-y-1">
-              {/* Miniature verbatim binding line */}
               <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-11 sm:w-12 border-r border-dashed border-neutral-400 flex items-center justify-center text-[9px] text-neutral-500">
                 <span style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>
                   装订线 · 答题时不要超过此线
@@ -329,12 +305,12 @@ export function HomeView() {
         >
           <div
             onClick={() => setActiveTab('ppt')}
-            className="lg:col-span-7 order-2 lg:order-1 cursor-pointer group"
+            className="lg:col-span-8 order-2 lg:order-1 cursor-pointer group"
           >
             <div className="relative aspect-[16/9] overflow-hidden rounded-md border border-[#DAD7CE] bg-[#FAF9F5] shadow-[var(--shadow-sheet)] transition-transform duration-500 group-hover:-translate-y-1">
               <img
                 src="./templates/ppt/review-classic/assets/bg-content.jpg"
-                alt="review-classic 幻灯片底纹"
+                alt="review-classic"
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <div className="relative h-full p-5 sm:p-7 flex flex-col justify-between text-[#15181E]">
@@ -352,7 +328,6 @@ export function HomeView() {
                     </div>
                     <span className="text-[10px] sm:text-[11px] text-[#6B6F76]">2024 数学分析(B1) 期末</span>
                   </div>
-                  {/* Verbatim Route Rail */}
                   <svg viewBox="0 0 600 18" className="w-full h-4 mt-2">
                     <line x1="0" y1="9" x2="36" y2="9" stroke="#1F5FC9" strokeWidth="1.6" />
                     <circle cx="46" cy="9" r="6" fill="#FAF9F5" stroke="#1F5FC9" strokeWidth="1.6" />
@@ -371,20 +346,20 @@ export function HomeView() {
             </div>
           </div>
 
-          <div className="lg:col-span-5 order-1 lg:order-2 space-y-3">
+          <div className="lg:col-span-4 order-1 lg:order-2 space-y-3">
             <h2 className="font-editorial text-2xl sm:text-[28px] font-medium text-[var(--ink-primary)]">
-              经典讲评 PPT 与放映厅
+              讲评课件
             </h2>
-            <p className="text-sm leading-[1.8] text-[var(--ink-secondary)]">
-              原汁原味复刻 <code className="font-mono-num text-xs">review-classic</code> 模板：16:9 宽屏素雅底纹、流线型题目进度轨道、MathJax 矢量公式混排、长解析自动分页与完整演讲者备注，一键导出 <code className="font-mono-num text-xs">.pptx</code>。
-            </p>
+            <div className="font-mono-num text-xs text-[var(--ink-muted)]">
+              review-classic · 16:9 · PPTX
+            </div>
             <div className="pt-2">
               <button
                 type="button"
                 onClick={() => setActiveTab('ppt')}
                 className="inline-flex items-center gap-1 text-[13.5px] font-medium text-[var(--ink-primary)] underline decoration-[var(--border-strong)] underline-offset-[6px] hover:decoration-[var(--ink-primary)] cursor-pointer"
               >
-                打开讲评 PPT <ArrowUpRight className="h-3.5 w-3.5" />
+                PPT <ArrowUpRight className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
@@ -393,47 +368,33 @@ export function HomeView() {
 
       <hr className="border-0 border-t border-[var(--border-hairline)]" />
 
-      {/* Quiet Editorial Colophon */}
-      <footer className="pt-12 grid grid-cols-1 sm:grid-cols-3 gap-8 text-xs">
-        <div className="space-y-1.5">
+      {/* Minimal Single-Line Footer */}
+      <footer className="pt-10 flex flex-wrap items-center justify-between gap-4 text-xs text-[var(--ink-muted)]">
+        <div className="flex flex-wrap items-center gap-6">
           <button
             type="button"
             onClick={() => setActiveTab('mistakes')}
-            className="font-editorial text-sm font-medium text-[var(--ink-primary)] hover:text-[var(--accent)] cursor-pointer"
+            className="hover:text-[var(--ink-primary)] cursor-pointer"
           >
-            SM-2 错题本 ({mistakes.length})
+            错题本 ({mistakes.length})
           </button>
-          <p className="text-[var(--ink-muted)] leading-relaxed">
-            闪卡间隔重复打卡、手工录题，以及按错题一键生成巩固卷。
-          </p>
-        </div>
-
-        <div className="space-y-1.5">
           <button
             type="button"
-            onClick={() => setActiveTab('sources')}
-            className="font-editorial text-sm font-medium text-[var(--ink-primary)] hover:text-[var(--accent)] cursor-pointer"
+            onClick={() => setActiveTab('paper')}
+            className="hover:text-[var(--ink-primary)] cursor-pointer"
           >
-            本地试卷与备份 ({papers.length})
+            试卷 ({papers.length})
           </button>
-          <p className="text-[var(--ink-muted)] leading-relaxed">
-            全部数据离线留存于浏览器 IndexedDB，随时导出或恢复 JSON。
-          </p>
-        </div>
-
-        <div className="space-y-1.5">
           <a
             href="https://github.com/DDNdles/USTC-Question-Bank"
             target="_blank"
             rel="noreferrer"
-            className="font-editorial text-sm font-medium text-[var(--ink-primary)] hover:text-[var(--accent)] inline-flex items-center gap-1"
+            className="hover:text-[var(--ink-primary)] inline-flex items-center gap-1"
           >
             USTC-Question-Bank <ArrowUpRight className="h-3 w-3" />
           </a>
-          <p className="text-[var(--ink-muted)] leading-relaxed">
-            MIT License · 站点不内置版权题面，由浏览器运行时经 SHA-256 校验拉取。
-          </p>
         </div>
+        <span className="font-mono-num">MIT</span>
       </footer>
     </div>
   )

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 310" width="1040" height="310">
+  <rect x="0.5" y="0.5" width="1039" height="309" rx="16" fill="#F7F6F2" stroke="#E3E1DA"/>
+  <clipPath id="card"><rect x="0.5" y="0.5" width="1039" height="309" rx="16"/></clipPath>
+  <g clip-path="url(#card)" fill="none" stroke="#E8E6DE" stroke-width="1.2">
+    <circle cx="1040" cy="310" r="90"/>
+    <circle cx="1040" cy="310" r="140"/>
+    <circle cx="1040" cy="310" r="192" stroke-dasharray="3 6" stroke-linecap="round"/>
+  </g>
+  <!-- Eyebrow marker -->
+  <rect x="56" y="54" width="8" height="8" fill="#1F5FC9"/>
+  <text x="74" y="62.5" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="12" font-weight="600" letter-spacing="2.2" fill="#6B6F76">USTC · QUESTION BANK · STUDIO</text>
+  <!-- Geometric Q Logo on right -->
+  <g transform="translate(888, 72) scale(2.6)">
+    <path d="M23.5 21.1A10.5 10.5 0 1 1 21.1 23.5" stroke="#15181E" stroke-width="3.6" fill="none" stroke-linecap="butt"/>
+    <path d="M17.2 17.2L20.4 17.2L27.8 24.6L24.6 27.8L17.2 20.4Z" fill="#1F5FC9"/>
+  </g>
+  <!-- Main Title -->
+  <text x="56" y="148" font-family="Inter, 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif" font-size="52" font-weight="700" letter-spacing="-1.2" fill="#15181E">USTC-QBank-Studio</text>
+  <!-- Subtitle -->
+  <text x="56" y="192" font-family="'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="20" font-weight="500" fill="#2B2F36">中科大公开题库 · 零模型出卷、讲评 PPT 与错题复盘工作台</text>
+  <!-- Bottom route line -->
+  <line x1="56" y1="242" x2="112" y2="242" stroke="#1F5FC9" stroke-width="2"/>
+  <circle cx="122" cy="242" r="7.5" fill="#F7F6F2" stroke="#1F5FC9" stroke-width="1.8"/>
+  <circle cx="122" cy="242" r="3.2" fill="#1F5FC9"/>
+  <line x1="132" y1="242" x2="460" y2="242" stroke="#B9B6AC" stroke-width="1.2" stroke-dasharray="3 5"/>
+  <circle cx="242" cy="242" r="3.5" fill="#F7F6F2" stroke="#B9B6AC" stroke-width="1.4"/>
+  <circle cx="352" cy="242" r="3.5" fill="#F7F6F2" stroke="#B9B6AC" stroke-width="1.4"/>
+  <circle cx="464" cy="242" r="3.5" fill="#F7F6F2" stroke="#B9B6AC" stroke-width="1.4"/>
+  <text x="56" y="274" font-family="'JetBrains Mono', ui-monospace, SFMono-Regular, monospace" font-size="12" fill="#7A7E85">ustc-exam / gaokao / review-classic / IndexedDB + SHA-256 / SM-2</text>
+</svg>

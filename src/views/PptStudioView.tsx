@@ -112,10 +112,7 @@ export function PptStudioView() {
         <div className="mx-auto w-52 overflow-hidden rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-paper)] p-1.5">
           <img src="./images/study-vignette.svg" alt="讲评课件" className="aspect-[4/3] w-full rounded object-cover" />
         </div>
-        <h2 className="font-editorial text-2xl font-medium">先在试卷工坊组卷</h2>
-        <p className="text-sm text-[var(--ink-secondary)] leading-relaxed">
-          沿用 dsh-study 原版 review-classic 模板，自动生成封面、作答页与分页解析页，并写入演讲者备注。
-        </p>
+        <h2 className="font-editorial text-2xl font-medium">暂无试卷</h2>
         <button
           type="button"
           onClick={() => setActiveTab('paper')}

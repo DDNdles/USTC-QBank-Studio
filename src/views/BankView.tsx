@@ -294,16 +294,13 @@ export function BankView({
         <div className="mx-auto w-56 overflow-hidden rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] p-2 shadow-sm">
           <img src="./images/study-vignette.svg" alt="静谧书桌" className="aspect-[4/3] w-full rounded-xl object-cover" />
         </div>
-        <h2 className="font-editorial text-2xl font-semibold">本机尚未缓存任何课程题库</h2>
-        <p className="text-sm text-[var(--ink-secondary)] leading-relaxed">
-          前往「题库源与同步」勾选您需要的课程（例如数学分析、线性代数、力学），完成 SHA-256 校验后即可离线检索与出卷。
-        </p>
+        <h2 className="font-editorial text-2xl font-medium">尚未同步课程</h2>
         <button
           type="button"
           onClick={() => setActiveTab('sources')}
-          className="inline-flex items-center gap-2 rounded-full bg-[var(--ink-primary)] px-6 py-2.5 text-sm font-medium text-[var(--bg-paper)] cursor-pointer"
+          className="inline-flex items-center gap-2 rounded-md bg-[var(--ink-primary)] px-5 py-2 text-xs font-medium text-[var(--bg-paper)] cursor-pointer"
         >
-          <Database className="h-4 w-4" /> 前往同步课程 ({sources.find(s => s.source_id === 'ustc-official')?.manifest?.courses.length ?? 18} 门可选)
+          <Database className="h-3.5 w-3.5" /> 同步课程 ({sources.find(s => s.source_id === 'ustc-official')?.manifest?.courses.length ?? 18})
         </button>
       </div>
     )

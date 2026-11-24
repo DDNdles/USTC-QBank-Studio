@@ -103,9 +103,6 @@ export function SourcesView() {
           <h1 className="font-editorial text-2xl sm:text-3xl font-medium text-[var(--ink-primary)]">
             题库源与同步
           </h1>
-          <p className="text-xs sm:text-sm text-[var(--ink-secondary)] mt-1">
-            按课程同步至浏览器 IndexedDB，经 SHA-256 校验后离线可用。
-          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -426,12 +423,9 @@ export function SourcesView() {
       {/* Local Data Backup / Restore Card */}
       <div className="paper-card rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h3 className="font-editorial text-base font-semibold text-[var(--ink-primary)]">
-            试卷与错题本数据迁移
+          <h3 className="font-editorial text-base font-medium text-[var(--ink-primary)]">
+            本地数据备份
           </h3>
-          <p className="text-xs text-[var(--ink-secondary)] mt-0.5">
-            纯静态部署无云端账号；您可以随时将已组试卷、SM-2 错题进度导出为 JSON 备份，在手机与电脑间迁移。
-          </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <input

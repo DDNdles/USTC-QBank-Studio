@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 56" width="960" height="56">
+  <text x="2" y="44" font-family="Inter, 'Space Grotesk', sans-serif" font-size="24" font-weight="700" fill="#3A7BE0">04</text>
+  <text x="692" y="15" font-family="'JetBrains Mono', Inter, sans-serif" font-size="10.5" font-weight="600" letter-spacing="1.6" fill="#3A7BE0">STRUCTURE</text>
+  <line x1="56" y1="36" x2="90" y2="36" stroke="#3A7BE0" stroke-width="2"/>
+  <circle cx="96" cy="36" r="4.2" fill="#3A7BE0"/>
+  <line x1="102" y1="36" x2="302" y2="36" stroke="#3A7BE0" stroke-width="2"/>
+  <circle cx="308" cy="36" r="4.2" fill="#3A7BE0"/>
+  <line x1="314" y1="36" x2="514" y2="36" stroke="#3A7BE0" stroke-width="2"/>
+  <circle cx="520" cy="36" r="4.2" fill="#3A7BE0"/>
+  <line x1="526" y1="36" x2="720" y2="36" stroke="#3A7BE0" stroke-width="2"/>
+  <circle cx="732" cy="36" r="9" fill="none" stroke="#3A7BE0" stroke-width="2"/>
+  <circle cx="732" cy="36" r="4.2" fill="#3A7BE0"/>
+  <line x1="744" y1="36" x2="930" y2="36" stroke="#8B949E" stroke-width="1.2" stroke-dasharray="3 5" opacity="0.7"/>
+  <circle cx="936" cy="36" r="4.5" fill="none" stroke="#8B949E" stroke-width="1.5" opacity="0.8"/>
+</svg>

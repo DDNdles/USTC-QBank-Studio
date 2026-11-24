@@ -1,49 +1,102 @@
-# USTC QBank Studio · 科大题卷工坊
+<div align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/hero-dark.svg" />
+  <source media="(prefers-color-scheme: light)" srcset=".github/assets/hero.svg" />
+  <img alt="USTC-QBank-Studio" src=".github/assets/hero.svg" width="100%" />
+</picture>
+<p>
+  <a href="https://ddndles.github.io/USTC-QBank-Studio/"><img alt="GitHub Pages" src="https://img.shields.io/badge/demo-GitHub%20Pages-3A7BE0?style=flat-square&labelColor=24292F&logo=github&logoColor=white" /></a>
+  <a href="LICENSE"><img alt="License MIT" src="https://img.shields.io/badge/license-MIT-3A7BE0?style=flat-square&labelColor=24292F" /></a>
+  <a href="package.json"><img alt="TypeScript" src="https://img.shields.io/badge/typescript-React%2019-3A7BE0?style=flat-square&labelColor=24292F&logo=typescript&logoColor=white" /></a>
+  <a href="src/db/storage.ts"><img alt="IndexedDB" src="https://img.shields.io/badge/storage-IndexedDB-3A7BE0?style=flat-square&labelColor=24292F" /></a>
+</p>
+<p>
+  <a href="#功能模块">01 功能模块</a> &nbsp;&nbsp;
+  <a href="#模板与导出">02 模板与导出</a> &nbsp;&nbsp;
+  <a href="#题库同步与离线协议">03 题库同步</a> &nbsp;&nbsp;
+  <a href="#仓库结构与本地开发">04 仓库结构</a> &nbsp;&nbsp;
+  <a href="#联系方式">05 联系方式</a>
+</p>
+</div>
 
-面向 [USTC-Question-Bank](https://github.com/DDNdles/USTC-Question-Bank) 的**纯前端、零模型依赖、GitHub Pages 静态托管**学习排版工作台。完整迁移并重构了 `dsh-study` 的全部非大模型核心能力，采用致敬 Typora 官网的极简纸韵排版美学，内置桌面端双栏工坊与移动端浮动毛玻璃底部切换栏。
+面向 [DDNdles/USTC-Question-Bank](https://github.com/DDNdles/USTC-Question-Bank) 的**纯前端、零模型静态工作台**（GitHub Pages 托管），完整迁移 [dsh-study](https://github.com/DDNdles/dsh-study) 的非大模型能力——包括多源题库按需同步、层级知识点检索、条件/蓝图/自选/错题组卷、原版试卷与讲评 PPT 导出及 SM-2 错题复盘。
 
-- **在线体验**：https://ddndles.github.io/USTC-QBank-Studio/
-- **默认公开题库源**：[DDNdles/USTC-Question-Bank](https://github.com/DDNdles/USTC-Question-Bank)（不内置任何题目版权内容，浏览器运行时按需拉取并经 SHA-256 校验后离线缓存至 IndexedDB）
+- **在线访问**：[ddndles.github.io/USTC-QBank-Studio](https://ddndles.github.io/USTC-QBank-Studio/)
 
-## 核心功能（全部零大模型直出）
+> **数据与版权边界**：本仓库代码采用 [MIT License](LICENSE)，**不内置任何课程真题或题库版权内容**。题库数据由浏览器在运行时按需从公开仓库或用户自建源拉取，经 `SHA-256` 校验后缓存于本机 IndexedDB；题面与解答版权归原权利人所有，详阅 [USTC-Question-Bank/NOTICE.md](https://github.com/DDNdles/USTC-Question-Bank/blob/main/NOTICE.md)。
 
-1. **多源题库同步与离线缓存（IndexedDB + SHA-256）**
-   - 内置 `DDNdles/USTC-Question-Bank`（自动双线路回退：`jsDelivr CDN` → `GitHub Raw`，支持自定义加速镜像）。
-   - 支持按课程按需同步、Web Crypto `SHA-256` 完整性校验、接入任意 v1.0 协议远程 HTTP/GitHub 题库源或导入本地题库目录。
-   - 支持一键导出/恢复试卷与错题本 JSON 备份。
+<img alt="01" src=".github/assets/route-01.svg" width="100%" />
 
-2. **题库检索、层级知识点树与自选组卷篮**
-   - 按课程、层级知识点树（含递归计题）、题型、答案来源（官方标答 / 社区详解 / AI 推导）、难度区间、真题年份与中文/公式关键词实时检索。
-   - 内置 KaTeX 公式渲染与题图展示，支持一键加入自选篮、记入错题本、或提交 8 类题目纠错反馈（直推反馈接口 + 自动预填 USTC GitLab / GitHub Issue）。
+## 功能模块
 
-3. **智能组卷与标准考试卷排版工坊**
-   - 支持条件随机抽题（可设随机种子复现）、自定义大题蓝图、自选篮组卷、错题巩固组卷及候选不足放宽建议。
-   - 支持拖拽/上下调序、单题分值修改、红字易错点评（`comment_md`）编辑与卷头元信息定制。
-   - 双模板双模式实时预览与导出：
-     - **中科大标准考试卷（`ustc-exam`）**：奇数页左侧密封装订线、动态得分表、黑体解/证明、红字点评块。
-     - **高考标准考试卷（`gaokao`）**：绝密标识、注意事项、连续题号。
-     - 均支持 **「题目后附解析」** 与 **「原题与答案分开」**，可一键**打印 / 另存高清 PDF**、下载**离线独立 `.html`** 或下载完整 **XeLaTeX `.tex` 源码**。
+| 模块 | 入口 | 核心能力 |
+| --- | --- | --- |
+| **题库浏览** | `#/bank` | 课程、层级知识点树（含递归计题）、题型、答案来源（`official` / `community` / `ai`）、难度、年份与全文检索；自选组卷篮、记错题、8 类题目纠错反馈（直推接口 + 预填 GitLab / GitHub Issue） |
+| **试卷工坊** | `#/paper` | 随机种子条件组卷、自定义大题蓝图、候选不足放宽提示；单题调序、改分、红字点评编辑与卷头定制；支持打印 PDF、独立 HTML 与 XeLaTeX 源码导出 |
+| **讲评 PPT** | `#/ppt` | 原版 `review-classic` 16:9 课件实时预览、键盘全屏放映、演讲者备注查看与浏览器原生 `.pptx` 打包下载 |
+| **错题复盘** | `#/mistakes` | SM-2 间隔重复调度、今日待复习闪卡、手工 Markdown + LaTeX 录题、一键生成错题巩固卷（原题重做 + 同知识点拓展） |
+| **题库源** | `#/sources` | 多源目录刷新、按课程增量同步与 `SHA-256` 校验、CDN / 加速镜像配置、本地 v1.0 目录导入、试卷与错题 JSON 备份迁移 |
 
-4. **经典 16:9 讲评 PPTX 制作与在线放映厅**
-   - 原版保留 `dsh-study` 的 `review-classic` 模板（`template.json`、`bg-content.jpg`、`icon-question.png`、`icon-solution.png` 与流线型题目进度轨道），纯浏览器集成 `mathjax-full` 矢量公式混排 + `pptxgenjs` 导出 `.pptx`，支持长解析自动分页、完整演讲者备注（Speaker Notes）与全屏键盘放映模式。
+<img alt="02" src=".github/assets/route-02.svg" width="100%" />
 
-5. **个人错题本与 SM-2 间隔重复复习**
-   - 完整实现 SM-2 记忆调度算法（重来 / 困难 / 良好 / 轻松掌握），内置今日待复习闪卡流、手工 Markdown+LaTeX 录题器，以及一键生成错题巩固卷（原题重做 + 同知识点举一反三）。
+## 模板与导出
 
-## 本地开发
+全部排版模板原封不动沿用自 [dsh-study/templates](https://github.com/DDNdles/dsh-study/tree/main/templates)：
+
+| 模板 ID | 格式 | 名称 | 特性说明 |
+| --- | --- | --- | --- |
+| `ustc-exam` | PDF / HTML / `.tex` | 中科大标准考试卷 | 奇数页左侧密封装订线、动态得分表、黑体解/证明、红字点评；支持「题后附解析」与「原题/答案分开」 |
+| `gaokao` | PDF / HTML / `.tex` | 高考标准考试卷 | 卷头绝密标识与注意事项、大题赋分、连续编号；兼容 `exam-zh` 宏包与网页打印 |
+| `review-classic` | `.pptx` / 在线放映 | 经典讲评 PPT | 16:9 宽屏，沿用原版素雅底纹（`bg-content.jpg`）、图标与流线型题目进度轨道；`mathjax-full` 矢量公式混排、长解析自动分页与完整 Speaker Notes |
+
+<img alt="03" src=".github/assets/route-03.svg" width="100%" />
+
+## 题库同步与离线协议
+
+遵循题库协议 v1.0，支持三种浏览器端接入方式：
+
+- **GitHub 仓库（默认）**：预置 `DDNdles/USTC-Question-Bank`，自动按 `jsDelivr CDN` → `raw.githubusercontent.com` 回退拉取，可自定义代理前缀
+- **HTTP Manifest**：任意支持 CORS 的静态站点或对象存储（含 `manifest.json` 与 `courses/<课号>/`）
+- **本地目录导入**：通过浏览器目录选择直接导入符合 v1.0 结构的私有题库及 `assets/` 配图
+
+所有远程课程同步前均通过 Web Crypto API 校验 `meta.json`、`taxonomy.json`、`questions.jsonl` 的 `SHA-256` 摘要，写入 IndexedDB 后可完全离线使用。
+
+<img alt="04" src=".github/assets/route-04.svg" width="100%" />
+
+## 仓库结构与本地开发
+
+```text
+USTC-QBank-Studio/
+├── .github/
+│   ├── assets/                   # README 顶图与路线图分隔 SVG
+│   └── workflows/deploy.yml      # GitHub Pages 自动构建部署
+├── public/
+│   ├── favicon.svg               # 几何 Q 标识
+│   ├── images/                   # 主视觉与学科插画
+│   └── templates/ppt/review-classic/assets/   # dsh-study 原版 PPT 底纹与图标
+└── src/
+    ├── components/               # Logo、导航（桌面极简顶栏 + 移动端底部毛玻璃栏）、KaTeX 与弹窗
+    ├── context/StudyContext.tsx  # 全局状态与 IndexedDB 桥接
+    ├── db/storage.ts             # IndexedDB 持久化与 JSON 备份恢复
+    ├── engine/                   # 组卷器、原版 LaTeX/HTML 渲染器、MathJax + PptxGenJS 引擎
+    ├── services/                 # 多源 SHA-256 同步、SM-2 错题调度、题目纠错反馈
+    ├── templates/                # dsh-study 原版 ustc-exam / gaokao / review-classic 模板
+    └── views/                    # 总览 / 题库 / 出卷 / PPT / 错题 / 题库源
+```
 
 ```bash
+git clone https://github.com/DDNdles/USTC-QBank-Studio.git
+cd USTC-QBank-Studio
 npm install
-npm run dev
+npm run dev       # 本地开发
+npm run build     # TypeScript 检查与生产构建
 ```
 
-生产构建：
+<img alt="05" src=".github/assets/route-05.svg" width="100%" />
 
-```bash
-npm run build
-npm run preview
-```
+## 联系方式
 
-## 许可协议
-
-本项目源码采用 [MIT License](LICENSE)。题库数据版权归原题库作者及相应出题方所有，详见 [USTC-Question-Bank](https://github.com/DDNdles/USTC-Question-Bank)。
+- **GitHub**：[@DDNdles](https://github.com/DDNdles) · [Issues](https://github.com/DDNdles/USTC-QBank-Studio/issues)
+- **题库数据仓库**：[DDNdles/USTC-Question-Bank](https://github.com/DDNdles/USTC-Question-Bank) · [USTC GitLab 镜像](https://git.ustc.edu.cn/zzl_stella05/USTC-Question-Bank)
+- **桌面插件版（含大模型协作）**：[DDNdles/dsh-study](https://github.com/DDNdles/dsh-study)
+- **中科大邮箱**：[zzl_stella05@mail.ustc.edu.cn](mailto:zzl_stella05@mail.ustc.edu.cn)

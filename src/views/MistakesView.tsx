@@ -275,10 +275,7 @@ export function MistakesView({
           <div className="mx-auto w-52 overflow-hidden rounded-xl border border-[var(--border-hairline)] p-1.5 bg-[var(--bg-canvas)]">
             <img src="./images/study-vignette.svg" alt="静谧笔记本" className="aspect-[4/3] w-full rounded-lg object-cover" />
           </div>
-          <h3 className="font-editorial text-xl font-semibold">错题本清澈如纸</h3>
-          <p className="text-xs sm:text-sm text-[var(--ink-secondary)] max-w-md mx-auto">
-            您可以在「题库浏览」中点击任意题目的「记错题」，或点击上方「手工录错题」记录平时作业中的好题。
-          </p>
+          <h3 className="font-editorial text-xl font-medium">暂无错题</h3>
         </div>
       ) : (
         <div className="space-y-4">
