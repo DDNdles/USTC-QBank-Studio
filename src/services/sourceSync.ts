@@ -102,22 +102,64 @@ export function buildSearchText(q: QuestionRecord): string {
     .toLowerCase()
 }
 
+function compareSemver(a?: string | null, b?: string | null): number {
+  const pa = (a ?? '0.0.0').split('.').map(n => parseInt(n, 10) || 0)
+  const pb = (b ?? '0.0.0').split('.').map(n => parseInt(n, 10) || 0)
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const diff = (pa[i] ?? 0) - (pb[i] ?? 0)
+    if (diff !== 0) return diff
+  }
+  return 0
+}
+
 export async function refreshSourceManifest(
   source: SourceConfig,
   signal?: AbortSignal,
 ): Promise<SourceConfig> {
   if (source.transport === 'local-import') return source
   const urls = buildCandidateUrls(source, 'manifest.json')
-  const buf = await fetchWithFallback(urls, signal)
-  const text = new TextDecoder('utf-8').decode(buf)
-  const manifest = JSON.parse(text) as BankManifest
-  if (!manifest || !Array.isArray(manifest.courses)) {
-    throw new Error('manifest.json 格式不符合题库协议 v1.0')
+  let bestManifest: BankManifest | null = null
+  let lastError: unknown = null
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { signal, cache: 'no-cache' })
+      if (!res.ok) {
+        lastError = new Error(`HTTP ${res.status} (${url})`)
+        continue
+      }
+      const text = new TextDecoder('utf-8').decode(await res.arrayBuffer())
+      const parsed = JSON.parse(text) as BankManifest
+      if (!parsed || !Array.isArray(parsed.courses)) {
+        lastError = new Error('manifest.json 格式不符合题库协议 v1.0')
+        continue
+      }
+      if (!bestManifest || compareSemver(parsed.data_version, bestManifest.data_version) > 0) {
+        bestManifest = parsed
+      }
+      // If a CDN mirror serves a stale version older than our cached manifest, keep trying later candidates (e.g. raw GitHub)
+      if (!source.data_version || compareSemver(parsed.data_version, source.data_version) >= 0) {
+        break
+      }
+    } catch (err) {
+      if (signal?.aborted) throw err
+      lastError = err
+    }
   }
+
+  if (!bestManifest) {
+    throw lastError instanceof Error ? lastError : new Error('网络请求失败，请检查网络或切换镜像地址')
+  }
+
+  // Never downgrade a newer bundled/cached manifest with a stale CDN response
+  if (source.manifest && compareSemver(bestManifest.data_version, source.data_version) < 0) {
+    return source
+  }
+
   const updated: SourceConfig = {
     ...source,
-    data_version: manifest.data_version ?? source.data_version,
-    manifest,
+    data_version: bestManifest.data_version ?? source.data_version,
+    manifest: bestManifest,
   }
   await saveSource(updated)
   return updated

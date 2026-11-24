@@ -100,6 +100,16 @@ export const DEFAULT_SOURCES: SourceConfig[] = [
   },
 ]
 
+function compareSemver(a?: string | null, b?: string | null): number {
+  const pa = (a ?? '0.0.0').split('.').map(n => parseInt(n, 10) || 0)
+  const pb = (b ?? '0.0.0').split('.').map(n => parseInt(n, 10) || 0)
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const diff = (pa[i] ?? 0) - (pb[i] ?? 0)
+    if (diff !== 0) return diff
+  }
+  return 0
+}
+
 export async function ensureBuiltinSources(): Promise<SourceConfig[]> {
   const db = await getDb()
   const existing = (await db.getAll('sources')).filter(s => s.source_id !== 'local-personal')
@@ -111,7 +121,13 @@ export async function ensureBuiltinSources(): Promise<SourceConfig[]> {
       byId.set(def.source_id, def)
     } else if (def.source_id === 'ustc-official') {
       const cur = byId.get(def.source_id)!
-      if (!cur.manifest) {
+      const defCount = def.manifest?.courses?.length ?? 0
+      const curCount = cur.manifest?.courses?.length ?? 0
+      if (
+        !cur.manifest ||
+        compareSemver(def.data_version, cur.data_version) > 0 ||
+        (compareSemver(def.data_version, cur.data_version) === 0 && defCount > curCount)
+      ) {
         cur.manifest = def.manifest
         cur.data_version = def.data_version
         await db.put('sources', cur)

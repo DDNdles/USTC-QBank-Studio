@@ -27,23 +27,25 @@
 
 ## 界面预览
 
-<p align="center">
-  <img alt="总览 · 学科与课程" src=".github/assets/preview-overview.png" width="100%" />
-  <br />
-  <sub>总览 · 学科与课程</sub>
-</p>
-
-<p align="center">
-  <img alt="出卷 · 中科大 A4 分页试卷预览" src=".github/assets/preview-pdf.png" width="100%" />
-  <br />
-  <sub>出卷 · 中科大 A4 分页试卷预览（奇数页装订线 · PDF / HTML / XeLaTeX）</sub>
-</p>
-
-<p align="center">
-  <img alt="PPT · review-classic 16:9 讲评课件" src=".github/assets/preview-ppt.png" width="100%" />
-  <br />
-  <sub>PPT · <code>review-classic</code> 16:9 讲评课件与 <code>.pptx</code> 导出</sub>
-</p>
+<table>
+  <tr>
+    <td align="center" width="33.3%">
+      <img alt="总览 · USTC QBank Studio" src=".github/assets/preview-overview.png" width="100%" />
+      <br />
+      <sub>总览 · USTC QBank Studio</sub>
+    </td>
+    <td align="center" width="33.3%">
+      <img alt="标准试卷 · ustc-exam / gaokao" src=".github/assets/preview-pdf.png" width="100%" />
+      <br />
+      <sub>标准试卷 · <code>ustc-exam</code> / <code>gaokao</code></sub>
+    </td>
+    <td align="center" width="33.3%">
+      <img alt="讲评课件 · review-classic 16:9 PPTX" src=".github/assets/preview-ppt.png" width="100%" />
+      <br />
+      <sub>讲评课件 · <code>review-classic</code> PPTX</sub>
+    </td>
+  </tr>
+</table>
 
 <img alt="01" src=".github/assets/route-01.svg" width="100%" />
 

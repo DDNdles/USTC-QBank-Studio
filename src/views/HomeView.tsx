@@ -24,12 +24,33 @@ const DISCIPLINES = [
     label: '信息与工程',
     image: './images/subject-cs.jpg',
     match: (code: string, dept: string) =>
-      !dept.includes('数学') &&
-      !dept.includes('物理') &&
-      !code.startsWith('MATH') &&
-      !code.startsWith('STAT') &&
-      !code.startsWith('PHYS') &&
-      code !== '001548',
+      dept.includes('计算机') ||
+      dept.includes('信息') ||
+      dept.includes('工程') ||
+      dept.includes('电子') ||
+      code.startsWith('CS') ||
+      code.startsWith('EE') ||
+      code === '210070' ||
+      code === '210050' ||
+      code === '023181',
+  },
+  {
+    id: 'chemistry',
+    label: '化学科学',
+    image: './images/subject-chemistry.jpg',
+    match: (code: string, dept: string) =>
+      dept.includes('化学') || code.startsWith('CHEM') || code.startsWith('019'),
+  },
+  {
+    id: 'politics',
+    label: '思想政治',
+    image: './images/subject-politics.jpg',
+    match: (code: string, dept: string) =>
+      dept.includes('马克思') ||
+      dept.includes('思政') ||
+      dept.includes('政治') ||
+      code.startsWith('MARX') ||
+      code.startsWith('POLI'),
   },
 ] as const
 
@@ -46,7 +67,7 @@ export function HomeView() {
 
   const official = sources.find(s => s.source_id === 'ustc-official')
   const manifestCourses = official?.manifest?.courses ?? []
-  const totalCatalogQuestions = official?.manifest?.stats?.questions ?? 8283
+  const totalCatalogQuestions = official?.manifest?.stats?.questions ?? 11710
   const installedMap = official?.installed_courses ?? {}
 
   const handleOpenCourse = async (code: string) => {
@@ -127,7 +148,7 @@ export function HomeView() {
             />
           </div>
           <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11.5px] font-mono-num text-[var(--ink-muted)]">
-            <span>USTC-Question-Bank · v{official?.data_version ?? '0.11.0'}</span>
+            <span>USTC-Question-Bank · v{official?.data_version ?? '0.14.0'}</span>
             <span>
               {manifestCourses.length} 门课程 · {totalCatalogQuestions.toLocaleString()} 题
             </span>
@@ -137,7 +158,7 @@ export function HomeView() {
 
       <hr className="border-0 border-t border-[var(--border-hairline)]" />
 
-      {/* Section 1: Three Illustrated Discipline Shelves (v1 card layout, zero descriptive sub-copy) */}
+      {/* Section 1: Five Illustrated Discipline Shelves (3 + 2 editorial grid, zero descriptive sub-copy) */}
       <section className="py-16 sm:py-24 space-y-8">
         <div className="flex items-end justify-between gap-4">
           <h2 className="font-editorial text-2xl sm:text-[30px] font-medium tracking-tight text-[var(--ink-primary)]">
@@ -152,11 +173,12 @@ export function HomeView() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
           {DISCIPLINES.map((disc, idx) => {
             const matched = manifestCourses.filter(c => disc.match(c.code, c.department))
             const qSum = matched.reduce((sum, c) => sum + c.total, 0)
             const synced = matched.filter(c => Boolean(installedMap[c.code])).length
+            const isSecondRow = idx >= 3
 
             return (
               <motion.article
@@ -164,11 +186,17 @@ export function HomeView() {
                 initial={{ opacity: 0, y: 18 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
-                transition={{ duration: 0.48, delay: idx * 0.08 }}
+                transition={{ duration: 0.48, delay: (idx % 3) * 0.08 }}
                 whileHover={{ y: -4 }}
-                className="paper-card group rounded-2xl overflow-hidden flex flex-col"
+                className={`paper-card group rounded-2xl overflow-hidden flex flex-col ${
+                  isSecondRow ? 'md:col-span-3' : 'md:col-span-2'
+                }`}
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-[var(--bg-subtle)] border-b border-[var(--border-hairline)]">
+                <div
+                  className={`relative aspect-[4/3] overflow-hidden bg-[var(--bg-subtle)] border-b border-[var(--border-hairline)] ${
+                    isSecondRow ? 'md:aspect-auto md:h-[280px]' : 'md:aspect-auto md:h-[246px]'
+                  }`}
+                >
                   <img
                     src={disc.image}
                     alt={disc.label}
