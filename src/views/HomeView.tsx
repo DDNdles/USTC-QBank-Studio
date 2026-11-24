@@ -1,6 +1,5 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ArrowRight, ArrowUpRight, CheckCircle2, Download } from 'lucide-react'
 import { useStudy } from '../context/StudyContext'
 import { BrandLogo } from '../components/BrandLogo'
 import { RichMath } from '../components/RichMath'
@@ -45,15 +44,10 @@ export function HomeView() {
     syncing,
   } = useStudy()
 
-  const [activeDisciplineId, setActiveDisciplineId] = useState<string>('math')
-
   const official = sources.find(s => s.source_id === 'ustc-official')
   const manifestCourses = official?.manifest?.courses ?? []
   const totalCatalogQuestions = official?.manifest?.stats?.questions ?? 8283
   const installedMap = official?.installed_courses ?? {}
-
-  const activeDiscipline =
-    DISCIPLINES.find(d => d.id === activeDisciplineId) ?? DISCIPLINES[0]
 
   const handleOpenCourse = async (code: string) => {
     if (installedMap[code]) {
@@ -63,6 +57,20 @@ export function HomeView() {
       await syncCourses('ustc-official', [code])
       setBankCourseFilter([code])
       setActiveTab('bank')
+    }
+  }
+
+  const handleOpenShelf = async (codes: string[]) => {
+    const already = codes.filter(c => Boolean(installedMap[c]))
+    if (already.length > 0) {
+      setBankCourseFilter(already)
+      setActiveTab('bank')
+    } else if (codes.length > 0 && !syncing) {
+      await syncCourses('ustc-official', [codes[0]])
+      setBankCourseFilter([codes[0]])
+      setActiveTab('bank')
+    } else {
+      setActiveTab('sources')
     }
   }
 
@@ -129,93 +137,94 @@ export function HomeView() {
 
       <hr className="border-0 border-t border-[var(--border-hairline)]" />
 
-      {/* Section 1: Asymmetric Swiss Discipline Index */}
-      <section className="py-16 sm:py-24 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-        <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-5">
+      {/* Section 1: Three Illustrated Discipline Shelves (v1 card layout, zero descriptive sub-copy) */}
+      <section className="py-16 sm:py-24 space-y-8">
+        <div className="flex items-end justify-between gap-4">
           <h2 className="font-editorial text-2xl sm:text-[30px] font-medium tracking-tight text-[var(--ink-primary)]">
             学科与课程
           </h2>
-
-          <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-subtle)]">
-            <AnimatePresence mode="wait">
-              <motion.img
-                key={activeDiscipline.id}
-                src={activeDiscipline.image}
-                alt={activeDiscipline.label}
-                initial={{ opacity: 0, scale: 1.02 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="h-full w-full object-cover"
-              />
-            </AnimatePresence>
-          </div>
+          <button
+            type="button"
+            onClick={() => setActiveTab('sources')}
+            className="inline-flex items-center gap-1 text-xs text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] cursor-pointer"
+          >
+            全部 {manifestCourses.length} 门课程 <ArrowUpRight className="h-3.5 w-3.5" />
+          </button>
         </div>
 
-        <div className="lg:col-span-7 divide-y divide-[var(--border-hairline)] border-t border-b border-[var(--border-hairline)]">
-          {DISCIPLINES.map(disc => {
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {DISCIPLINES.map((disc, idx) => {
             const matched = manifestCourses.filter(c => disc.match(c.code, c.department))
             const qSum = matched.reduce((sum, c) => sum + c.total, 0)
-            const isActive = activeDisciplineId === disc.id
+            const synced = matched.filter(c => Boolean(installedMap[c.code])).length
 
             return (
-              <div
+              <motion.article
                 key={disc.id}
-                onMouseEnter={() => setActiveDisciplineId(disc.id)}
-                onClick={() => setActiveDisciplineId(disc.id)}
-                className={`py-7 transition-opacity ${isActive ? 'opacity-100' : 'opacity-75 hover:opacity-100'}`}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.48, delay: idx * 0.08 }}
+                whileHover={{ y: -4 }}
+                className="paper-card group rounded-2xl overflow-hidden flex flex-col"
               >
-                <div className="flex items-baseline justify-between gap-4 mb-4">
-                  <h3 className="font-editorial text-xl font-medium text-[var(--ink-primary)]">
-                    {disc.label}
-                  </h3>
-                  <span className="font-mono-num text-xs text-[var(--ink-muted)]">
-                    {matched.length} · {qSum.toLocaleString()}
-                  </span>
+                <div className="relative aspect-[4/3] overflow-hidden bg-[var(--bg-subtle)] border-b border-[var(--border-hairline)]">
+                  <img
+                    src={disc.image}
+                    alt={disc.label}
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  />
+                  <div className="absolute top-3 right-3 rounded-full bg-white/85 dark:bg-[#1a1c21]/85 backdrop-blur-md px-2.5 py-1 text-[11px] font-mono-num text-[#1c1e21] dark:text-[#edece6] border border-white/60 dark:border-white/10">
+                    {matched.length} 门 · {qSum.toLocaleString()} 题
+                  </div>
                 </div>
 
-                <div className="flex flex-wrap gap-x-5 gap-y-2.5">
-                  {matched.map(course => {
-                    const cached = Boolean(installedMap[course.code])
-                    return (
-                      <button
-                        key={course.code}
-                        type="button"
-                        disabled={syncing}
-                        onClick={e => {
-                          e.stopPropagation()
-                          void handleOpenCourse(course.code)
-                        }}
-                        className="group inline-flex items-baseline gap-1.5 text-left text-[13.5px] text-[var(--ink-secondary)] hover:text-[var(--ink-primary)] transition-colors cursor-pointer disabled:opacity-45"
-                      >
-                        <span
-                          className={`inline-block h-1.5 w-1.5 rounded-full self-center ${
-                            cached ? 'bg-[var(--mastered)]' : 'bg-[var(--border-strong)] group-hover:bg-[var(--accent)]'
-                          }`}
-                        />
-                        <span className="group-hover:underline underline-offset-4">
-                          {course.name}
-                        </span>
-                        <span className="font-mono-num text-[11px] text-[var(--ink-muted)]">
-                          {course.total}
-                        </span>
-                      </button>
-                    )
-                  })}
+                <div className="p-5 flex-1 flex flex-col justify-between gap-4">
+                  <div>
+                    <h3 className="font-editorial text-xl font-medium text-[var(--ink-primary)]">
+                      {disc.label}
+                    </h3>
+
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {matched.map(course => {
+                        const isSynced = Boolean(installedMap[course.code])
+                        return (
+                          <button
+                            key={course.code}
+                            type="button"
+                            disabled={syncing}
+                            onClick={() => void handleOpenCourse(course.code)}
+                            className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11.5px] border transition-colors cursor-pointer disabled:opacity-45 ${
+                              isSynced
+                                ? 'border-[var(--mastered)]/30 bg-[var(--mastered-soft)] text-[var(--mastered)]'
+                                : 'border-[var(--border-hairline)] bg-[var(--bg-subtle)] text-[var(--ink-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--ink-primary)]'
+                            }`}
+                          >
+                            {isSynced && <CheckCircle2 className="h-2.5 w-2.5 shrink-0" />}
+                            <span>{course.name}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={syncing}
+                    onClick={() => void handleOpenShelf(matched.map(c => c.code))}
+                    className="inline-flex items-center justify-between rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-canvas)] px-3.5 py-2 text-xs font-medium text-[var(--ink-primary)] hover:border-[var(--accent-border)] hover:text-[var(--accent)] transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    <span>
+                      {synced > 0
+                        ? `浏览已同步（${synced}/${matched.length}）`
+                        : `同步「${matched[0]?.name ?? disc.label}」`}
+                    </span>
+                    {synced > 0 ? <ArrowRight className="h-3.5 w-3.5" /> : <Download className="h-3.5 w-3.5" />}
+                  </button>
                 </div>
-              </div>
+              </motion.article>
             )
           })}
-
-          <div className="py-5 flex items-center justify-end text-xs">
-            <button
-              type="button"
-              onClick={() => setActiveTab('sources')}
-              className="inline-flex items-center gap-1 text-[var(--ink-primary)] hover:text-[var(--accent)] cursor-pointer"
-            >
-              管理题库源 <ArrowUpRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
         </div>
       </section>
 
@@ -332,7 +341,7 @@ export function HomeView() {
                 alt="review-classic"
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <div className="relative h-full p-5 sm:p-7 flex flex-col justify-between text-[#15181E]">
+              <div className="relative h-full p-5 sm:p-7 flex flex-col text-[#15181E]">
                 <div>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5">
@@ -358,8 +367,15 @@ export function HomeView() {
                   </svg>
                 </div>
 
-                <div className="text-xs sm:text-[14px] leading-relaxed text-[#2B2F36] pb-3">
-                  <RichMath text="设 $f$ 在闭区间 $[a,b]$ 上有界。用 $\varepsilon$-$\delta$ 语言写出「$f$ 在 $[a,b]$ 上黎曼可积」的定义，并说明等分分割极限存在不足以保证可积性。" />
+                <div className="mt-5 sm:mt-8 space-y-2.5 text-xs sm:text-[14.5px] leading-[1.85] text-[#2B2F36]">
+                  <RichMath
+                    text="设 $f$ 在闭区间 $[a,b]$ 上有界。用 $\varepsilon$-$\delta$ 语言写出「$f$ 在 $[a,b]$ 上黎曼可积」的定义，并说明等分分割极限存在不足以保证可积性。"
+                    displayMathInline
+                  />
+                  <RichMath
+                    text="若进一步已知 $f$ 在 $[a,b]$ 上单调，证明 $f$ 必在 $[a,b]$ 上黎曼可积，并给出 Darboux 上下和之差 $\overline{S}(P)-\underline{S}(P)$ 的上界估计。"
+                    displayMathInline
+                  />
                 </div>
               </div>
             </div>

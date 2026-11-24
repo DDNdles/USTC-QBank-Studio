@@ -27,6 +27,7 @@ export function PptStudioView() {
   const [currentIdx, setCurrentIdx] = useState(0)
   const [direction, setDirection] = useState(1)
   const [building, setBuilding] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [exporting, setExporting] = useState<{ current: number; total: number } | null>(null)
   const [showNotes, setShowNotes] = useState(true)
   const [fullscreen, setFullscreen] = useState(false)
@@ -34,13 +35,16 @@ export function PptStudioView() {
   useEffect(() => {
     if (!activePaper) {
       setSlides([])
+      setLoadError(null)
       return
     }
     let cancelled = false
     setBuilding(true)
+    setLoadError(null)
 
     import('../engine/pptxEngine')
       .then(async mod => {
+        sessionStorage.removeItem('ustc_qbank_ppt_chunk_reload')
         const res = await mod.generateSlidesForPaper(activePaper)
         if (!cancelled) {
           setSlides(res.slides)
@@ -50,7 +54,17 @@ export function PptStudioView() {
         }
       })
       .catch(err => {
-        if (!cancelled) showToast(`课件排版失败：${err instanceof Error ? err.message : String(err)}`, 'error')
+        if (cancelled) return
+        const msg = err instanceof Error ? err.message : String(err)
+        const isChunkMismatch =
+          /Failed to fetch dynamically imported module|Importing a module script failed|Loading chunk/i.test(msg)
+        if (isChunkMismatch && !sessionStorage.getItem('ustc_qbank_ppt_chunk_reload')) {
+          sessionStorage.setItem('ustc_qbank_ppt_chunk_reload', '1')
+          window.location.reload()
+          return
+        }
+        setLoadError(msg)
+        showToast(`课件排版失败：${msg}`, 'error')
       })
       .finally(() => {
         if (!cancelled) setBuilding(false)
@@ -200,6 +214,17 @@ export function PptStudioView() {
             <div className="flex h-full flex-col items-center justify-center gap-3 text-sm text-[var(--ink-secondary)]">
               <Loader2 className="h-6 w-6 animate-spin text-[var(--accent)]" />
               <span>正在排版讲评幻灯片…</span>
+            </div>
+          ) : loadError ? (
+            <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-sm text-[var(--ink-secondary)]">
+              <div className="font-medium text-[var(--ink-primary)]">课件引擎加载失败</div>
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="rounded-md bg-[var(--ink-primary)] px-4 py-1.5 text-xs font-medium text-[var(--bg-paper)] cursor-pointer"
+              >
+                刷新页面重试
+              </button>
             </div>
           ) : currentSlide ? (
             <AnimatePresence mode="wait" custom={direction}>

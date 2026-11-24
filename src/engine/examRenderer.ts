@@ -113,6 +113,42 @@ export function resolveSolutionText(question: QuestionRecord): string {
   return ''
 }
 
+/**
+ * Splits a multi-paragraph or multi-step solution into flowable blocks for A4 pagination
+ * without ever slicing inside display math environments ($$...$$, \[...\]).
+ */
+export function splitSolutionParagraphs(rawText: string): string[] {
+  const raw = String(rawText ?? '').trim()
+  if (!raw) return []
+
+  const mathBlocks: string[] = []
+  const masked = raw.replace(/\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]/g, match => {
+    const idx = mathBlocks.length
+    mathBlocks.push(match)
+    return `\n@@SOLMATH_${idx}@@\n`
+  })
+
+  const restore = (s: string) =>
+    s.replace(/@@SOLMATH_(\d+)@@/g, (_, idxStr) => mathBlocks[Number(idxStr)] ?? '').trim()
+
+  const out: string[] = []
+  for (const chunk of masked.split(/\r?\n\s*\r?\n/)) {
+    const trimmed = chunk.trim()
+    if (!trimmed) continue
+    const lines = trimmed.split(/\r?\n/)
+    // Keep markdown tables intact
+    if (lines.length >= 2 && lines[0].includes('|') && /^\s*\|?[\s:-]+\|/.test(lines[1])) {
+      out.push(restore(trimmed))
+      continue
+    }
+    for (const line of lines) {
+      const piece = restore(line)
+      if (piece) out.push(piece)
+    }
+  }
+  return out.length ? out : [raw]
+}
+
 export function buildCommentText(item: PaperItem, question: QuestionRecord): string {
   const parts: string[] = []
   if (item.comment_md) parts.push(item.comment_md)
@@ -297,80 +333,13 @@ export function buildStandaloneExamHtml(
       .join('')
   }
 
-  const pagesHtml = outputs
+  const outputsHtml = outputs
     .map(output => {
       const groups = groupItems(paper.items)
       const showBinding = !isGaokao && fields.showBindingLine && !output.answerOnly
       let seq = 0
 
-      const sectionHtml = groups
-        .map((group, secIdx) => {
-          const scoreDetail = formatSectionScore(group)
-          const itemsHtml = group.items
-            .map(item => {
-              seq++
-              const q = item.question
-              const scoreTag =
-                isGaokao && !output.answerOnly && (q.type === 'solve' || q.type === 'proof')
-                  ? `<span class="gk-score">(${item.score}分) </span>`
-                  : ''
-              const choiceParen =
-                isGaokao && !output.answerOnly && (q.type === 'single' || q.type === 'multi')
-                  ? `<span class="gk-paren">(&nbsp;${output.showSolutions ? escapeHtml(extractChoiceKey(q.answer.md)) : '&nbsp;&nbsp;&nbsp;&nbsp;'}&nbsp;)</span>`
-                  : ''
-              const prompt = output.answerOnly
-                ? ''
-                : `<div class="stem rich-math rich-math-inline-lead">${scoreTag}${renderMarkdownToHtml(q.stem.md, mathOpts)}${choiceParen}</div>${renderFigs(item, q.stem.figures)}`
-              const options =
-                output.answerOnly || !q.options?.length
-                  ? ''
-                  : `<div class="options">${q.options
-                      .map(
-                        opt =>
-                          `<div class="opt-cell"><span class="opt-key">${escapeHtml(opt.key)}.</span><div class="rich-math rich-math-inline-lead">${renderMarkdownToHtml(opt.md, mathOpts)}</div></div>`,
-                      )
-                      .join('')}</div>`
-
-              const solText = resolveSolutionText(q)
-              const comment = buildCommentText(item, q)
-              const label = q.type === 'proof' ? '证明' : '解'
-
-              const solution = output.showSolutions
-                ? isGaokao
-                  ? `<section class="solution">
-                      ${shouldShowAnswerLine(q) ? `<div class="sol-row"><span class="heiti-bold">【答案】</span><span class="gap-sm"></span><div class="rich-math rich-math-inline-lead">${renderMarkdownToHtml(q.answer.md, mathOpts)}</div></div>` : ''}
-                      ${solText ? `<div class="sol-row"><span class="heiti-bold">【${label}】</span><span class="gap-sm"></span><div class="rich-math rich-math-inline-lead">${renderMarkdownToHtml(solText, mathOpts)}</div>${renderFigs(item, q.solution.figures)}</div>` : ''}
-                      ${comment ? `<div class="comment"><span class="heiti-bold">点评：</span><div class="rich-math rich-math-inline-lead">${renderMarkdownToHtml(comment, mathOpts)}</div></div>` : ''}
-                    </section>`
-                  : `<section class="solution">
-                      ${shouldShowAnswerLine(q) ? `<div class="sol-row"><span class="heiti-bold">答案：</span><span class="gap-sm"></span><div class="rich-math rich-math-inline-lead">${renderMarkdownToHtml(q.answer.md, mathOpts)}</div></div>` : ''}
-                      ${solText ? `<div class="sol-row"><span class="heiti-bold">${label}</span><span class="gap-quad"></span><div class="rich-math rich-math-inline-lead">${renderMarkdownToHtml(solText, mathOpts)}</div>${renderFigs(item, q.solution.figures)}</div>` : ''}
-                      ${comment ? `<div class="comment"><span class="heiti-bold">点评：</span><div class="rich-math rich-math-inline-lead">${renderMarkdownToHtml(comment, mathOpts)}</div></div>` : ''}
-                    </section>`
-                : q.type === 'solve' || q.type === 'proof'
-                  ? '<div class="answer-space"></div>'
-                  : ''
-
-              return `<article class="q-item"><div class="q-num">${isGaokao ? `${seq}.` : `(${seq})`}</div><div class="q-body">${prompt}${options}${solution}</div></article>`
-            })
-            .join('')
-
-          const headingHtml = isGaokao
-            ? `<h2 class="gk-section">${chineseNumber(secIdx + 1)}、${escapeHtml(group.title)}：${scoreDetail}</h2>`
-            : `<h2 class="ustc-section"><span class="heiti-bold">${chineseNumber(secIdx + 1)}.</span> (${scoreDetail}) ${escapeHtml(group.title)}</h2>`
-
-          return `<section class="exam-section">${headingHtml}${itemsHtml}</section>`
-        })
-        .join('')
-
-      const scoreTableHtml =
-        !isGaokao && !output.answerOnly
-          ? `<table class="score-table">
-              <tr><td class="heiti-bold">题号</td>${groups.map((_, i) => `<td>${chineseNumber(i + 1)}</td>`).join('')}<td class="heiti-bold">总分</td></tr>
-              <tr><td class="heiti-bold">满分</td>${groups.map(g => `<td>${g.score}</td>`).join('')}<td>${totalScore}</td></tr>
-              <tr><td class="heiti-bold">得分</td>${groups.map(() => '<td class="score-blank">&nbsp;</td>').join('')}<td class="score-blank">&nbsp;</td></tr>
-            </table>`
-          : ''
+      const blocksHtml: string[] = []
 
       const headerHtml = isGaokao
         ? output.answerOnly
@@ -398,43 +367,206 @@ export function buildStandaloneExamHtml(
             </div>
           </header>`
 
-      const footerText = isGaokao
-        ? `${escapeHtml(fields.subject)}试题第 1 页（共 1 页）`
-        : `${fields.footerTerm ? `${escapeHtml(formatDisplayTerm(fields.footerTerm))}　` : ''}第 1 页（共 1 页）`
+      const scoreTableHtml =
+        !isGaokao && !output.answerOnly
+          ? `<table class="score-table">
+              <tr><td class="heiti-bold">题号</td>${groups.map((_, i) => `<td>${chineseNumber(i + 1)}</td>`).join('')}<td class="heiti-bold">总分</td></tr>
+              <tr><td class="heiti-bold">满分</td>${groups.map(g => `<td>${g.score}</td>`).join('')}<td>${totalScore}</td></tr>
+              <tr><td class="heiti-bold">得分</td>${groups.map(() => '<td class="score-blank">&nbsp;</td>').join('')}<td class="score-blank">&nbsp;</td></tr>
+            </table>`
+          : ''
 
-      return `<section class="sheet ${showBinding ? 'with-binding' : 'no-binding'}">
-        ${showBinding ? buildUstcBindingLineSvg() : ''}
-        <div class="sheet-inner">
-          ${headerHtml}
-          ${scoreTableHtml}
-          ${sectionHtml}
-          <footer class="screen-footer">${footerText}</footer>
-        </div>
-      </section>`
+      blocksHtml.push(`<div class="exam-block" data-gap="0">${headerHtml}${scoreTableHtml}</div>`)
+
+      for (const [secIdx, group] of groups.entries()) {
+        const scoreDetail = formatSectionScore(group)
+        const headingHtml = isGaokao
+          ? `<h2 class="gk-section">${chineseNumber(secIdx + 1)}、${escapeHtml(group.title)}：${scoreDetail}</h2>`
+          : `<h2 class="ustc-section"><span class="heiti-bold">${chineseNumber(secIdx + 1)}.</span> (${scoreDetail}) ${escapeHtml(group.title)}</h2>`
+        blocksHtml.push(
+          `<div class="exam-block" data-keep-next="1" data-gap="${secIdx === 0 ? 10 : 18}">${headingHtml}</div>`,
+        )
+
+        for (const item of group.items) {
+          seq++
+          const q = item.question
+          const numLabel = isGaokao ? `${seq}.` : `(${seq})`
+          const solText = resolveSolutionText(q)
+          const comment = buildCommentText(item, q)
+          const label = q.type === 'proof' ? '证明' : '解'
+          const hasAnswer = output.showSolutions && shouldShowAnswerLine(q)
+          const solParas = output.showSolutions ? splitSolutionParagraphs(solText) : []
+          const hasWriteSpace = !output.showSolutions && (q.type === 'solve' || q.type === 'proof')
+
+          if (!output.answerOnly) {
+            const scoreTag =
+              isGaokao && (q.type === 'solve' || q.type === 'proof')
+                ? `<span class="gk-score">(${item.score}分) </span>`
+                : ''
+            const choiceParen =
+              isGaokao && (q.type === 'single' || q.type === 'multi')
+                ? `<span class="gk-paren">(&nbsp;${output.showSolutions ? escapeHtml(extractChoiceKey(q.answer.md)) : '&nbsp;&nbsp;&nbsp;&nbsp;'}&nbsp;)</span>`
+                : ''
+            const prompt = `<div class="stem rich-math rich-math-inline-lead">${scoreTag}${renderMarkdownToHtml(q.stem.md, mathOpts)}${choiceParen}</div>${renderFigs(item, q.stem.figures)}`
+            const options = !q.options?.length
+              ? ''
+              : `<div class="options">${q.options
+                  .map(
+                    opt =>
+                      `<div class="opt-cell"><span class="opt-key">${escapeHtml(opt.key)}.</span><div class="rich-math rich-math-inline-lead">${renderMarkdownToHtml(opt.md, mathOpts)}</div></div>`,
+                  )
+                  .join('')}</div>`
+            blocksHtml.push(
+              `<div class="exam-block" data-gap="14"${hasWriteSpace ? ' data-keep-next="1"' : ''}><article class="q-item"><div class="q-num">${numLabel}</div><div class="q-body">${prompt}${options}</div></article></div>`,
+            )
+          }
+
+          if (output.showSolutions) {
+            if (hasAnswer) {
+              const ansPrefix = isGaokao ? '【答案】' : '答案：'
+              blocksHtml.push(
+                `<div class="exam-block" data-gap="${output.answerOnly ? 14 : 6}"><div class="q-item"><div class="q-num">${output.answerOnly ? numLabel : ''}</div><div class="q-body"><span class="heiti-bold">${ansPrefix}</span><span class="gap-sm"></span><div class="rich-math rich-math-inline-lead">${renderMarkdownToHtml(q.answer.md, mathOpts)}</div></div></div></div>`,
+              )
+            }
+            solParas.forEach((para, pIdx) => {
+              const isFirst = pIdx === 0
+              const isLast = pIdx === solParas.length - 1
+              const showSeqHere = output.answerOnly && isFirst && !hasAnswer
+              const solPrefix = isFirst
+                ? isGaokao
+                  ? `<span class="heiti-bold">【${label}】</span><span class="gap-sm"></span>`
+                  : `<span class="heiti-bold">${label}</span><span class="gap-quad"></span>`
+                : ''
+              const gap = isFirst ? (output.answerOnly && !hasAnswer ? 14 : 6) : 5
+              blocksHtml.push(
+                `<div class="exam-block" data-gap="${gap}"><div class="q-item"><div class="q-num">${showSeqHere ? numLabel : ''}</div><div class="q-body">${solPrefix}<div class="rich-math rich-math-inline-lead">${renderMarkdownToHtml(para, mathOpts)}</div>${isLast ? renderFigs(item, q.solution.figures) : ''}</div></div></div>`,
+              )
+            })
+            if (comment) {
+              blocksHtml.push(
+                `<div class="exam-block" data-gap="6"><div class="q-item"><div class="q-num"></div><div class="q-body"><div class="comment"><span class="heiti-bold">点评：</span><div class="rich-math rich-math-inline-lead">${renderMarkdownToHtml(comment, mathOpts)}</div></div></div></div></div>`,
+              )
+            }
+          } else if (hasWriteSpace) {
+            blocksHtml.push(`<div class="exam-block" data-gap="0"><div class="answer-space"></div></div>`)
+          }
+        }
+      }
+
+      const footerPrefix = isGaokao
+        ? `${fields.subject}试题第 `
+        : `${fields.footerTerm ? `${formatDisplayTerm(fields.footerTerm)}　` : ''}第 `
+
+      return `<div class="doc-source" data-binding="${showBinding ? '1' : '0'}" data-footer-prefix="${escapeHtml(footerPrefix)}">${blocksHtml.join('')}</div>`
     })
     .join('')
 
-  const printFooterPrefix = isGaokao
-    ? `${fields.subject.replace(/"/g, '\\"')}试题第 `
-    : `${fields.footerTerm ? `${formatDisplayTerm(fields.footerTerm).replace(/"/g, '\\"')}   ` : ''}第 `
+  const bindingSvgJson = JSON.stringify(buildUstcBindingLineSvg())
 
-  const pageLeftMargin = !isGaokao && fields.showBindingLine ? '30mm' : '20mm'
+  const paginationScript = `<script>
+  (function () {
+    var BINDING_SVG = ${bindingSvgJson};
+    function paginateAll() {
+      var sources = Array.prototype.slice.call(document.querySelectorAll('.doc-source'));
+      var host = document.getElementById('paginated-root');
+      if (!host) return;
+      host.innerHTML = '';
+
+      // Measure millimeter to pixel conversion in current rendering context
+      var probe = document.createElement('div');
+      probe.style.cssText = 'position:absolute;left:-9999px;top:0;width:160mm;height:238mm;visibility:hidden';
+      document.body.appendChild(probe);
+      var maxBodyH = probe.getBoundingClientRect().height || 900;
+      document.body.removeChild(probe);
+
+      sources.forEach(function (src) {
+        var useBinding = src.getAttribute('data-binding') === '1';
+        var footerPrefix = src.getAttribute('data-footer-prefix') || '第 ';
+
+        var measureWrap = document.createElement('div');
+        measureWrap.className = 'measure-wrap';
+        measureWrap.innerHTML = src.innerHTML;
+        document.body.appendChild(measureWrap);
+
+        var blocks = Array.prototype.slice.call(measureWrap.children);
+        var heights = blocks.map(function (b) { return Math.ceil(b.getBoundingClientRect().height); });
+
+        var pages = [];
+        var cur = [];
+        var used = 0;
+        for (var i = 0; i < blocks.length; i++) {
+          var h = heights[i] || 0;
+          var gap = cur.length ? Number(blocks[i].getAttribute('data-gap') || 0) : 0;
+          var prevKeep = cur.length && cur[cur.length - 1].getAttribute('data-keep-next') === '1';
+          var keepNext = blocks[i].getAttribute('data-keep-next') === '1';
+          var nextGap = i + 1 < blocks.length ? Number(blocks[i + 1].getAttribute('data-gap') || 0) : 0;
+          var nextH = keepNext && i + 1 < blocks.length ? (heights[i + 1] || 0) + nextGap : 0;
+          var needed = keepNext && (h + nextH <= maxBodyH) ? h + nextH : h;
+          if (cur.length && !prevKeep && used + gap + needed > maxBodyH) {
+            pages.push(cur);
+            cur = [blocks[i]];
+            used = h;
+          } else {
+            cur.push(blocks[i]);
+            used += gap + h;
+          }
+        }
+        if (cur.length) pages.push(cur);
+
+        var total = pages.length;
+        pages.forEach(function (pageBlocks, idx) {
+          var pageNum = idx + 1;
+          var hasBinding = useBinding && (pageNum % 2 === 1);
+          var sheet = document.createElement('section');
+          sheet.className = 'sheet ' + (hasBinding ? 'with-binding' : 'no-binding');
+          if (hasBinding) {
+            sheet.insertAdjacentHTML('afterbegin', BINDING_SVG);
+          }
+          var inner = document.createElement('div');
+          inner.className = 'sheet-inner';
+          var body = document.createElement('div');
+          body.className = 'sheet-body';
+          pageBlocks.forEach(function (blk, pos) {
+            blk.style.marginTop = pos > 0 ? (Number(blk.getAttribute('data-gap') || 0) + 'px') : '0';
+            body.appendChild(blk);
+          });
+          var footer = document.createElement('footer');
+          footer.className = 'page-footer';
+          footer.textContent = footerPrefix + pageNum + ' 页（共 ' + total + ' 页）';
+          inner.appendChild(body);
+          inner.appendChild(footer);
+          sheet.appendChild(inner);
+          host.appendChild(sheet);
+        });
+
+        document.body.removeChild(measureWrap);
+      });
+    }
+
+    window.__dshPaginatedReady = (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
+      .then(function () { paginateAll(); });
+  })();
+  </script>`
 
   return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css"><title>${escapeHtml(paper.title)}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"><style>
   *{box-sizing:border-box}
   body{font-family:"SimSun","Songti SC","Noto Serif CJK SC","STSong",serif;color:#000000;background:#eceae4;margin:0;padding:24px 16px;line-height:1.75;font-size:11pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   .heiti-bold{font-family:"SimHei","Heiti SC","Noto Sans SC","Microsoft YaHei",sans-serif;font-weight:700}
-  .sheet{position:relative;background:#ffffff;width:210mm;min-height:297mm;margin:0 auto 24px;box-shadow:0 2px 14px rgba(0,0,0,.12)}
-  .sheet.with-binding{padding:23mm 20mm 22mm 30mm}
-  .sheet.no-binding{padding:23mm 20mm 22mm 20mm}
+  .doc-source{display:none}
+  .measure-wrap{position:fixed;left:-10000px;top:0;width:160mm;visibility:hidden}
+  .sheet{position:relative;background:#ffffff;width:210mm;min-height:297mm;margin:0 auto 24px;box-shadow:0 2px 14px rgba(0,0,0,.12);display:flex;flex-direction:column}
+  .sheet.with-binding{padding:23mm 20mm 14mm 30mm}
+  .sheet.no-binding{padding:23mm 20mm 14mm 20mm}
+  .sheet-inner{flex:1;display:flex;flex-direction:column}
+  .sheet-body{flex:1;display:flex;flex-direction:column}
   .ustc-binding-svg{position:absolute;left:0;top:0;width:28mm;height:297mm;pointer-events:none}
   .ustc-header{text-align:center;margin-bottom:4mm}
   .ustc-title{font-family:"SimHei","Heiti SC","Noto Sans SC","Microsoft YaHei",sans-serif;font-size:14.4pt;font-weight:700;line-height:1.45;margin-bottom:1.5mm;color:#000}
   .ustc-meta{margin-top:2.5mm;font-size:11pt;color:#000}
   .ustc-underline{display:inline-block;min-width:32mm;border-bottom:0.75pt solid #000;padding:0 3mm;text-align:center;line-height:1.3}
   .ustc-meta-gap{display:inline-block;width:12mm}
-  table.score-table{border-collapse:collapse;margin:4mm auto 6mm;font-size:10.8pt;color:#000}
+  table.score-table{border-collapse:collapse;margin:4mm auto 2mm;font-size:10.8pt;color:#000}
   table.score-table td{border:0.75pt solid #000;padding:5px 14px;text-align:center;min-width:11mm}
   table.score-table td.score-blank{min-width:13mm}
   .gk-secret{font-family:"SimHei","Heiti SC","Noto Sans SC","Microsoft YaHei",sans-serif;font-weight:700;font-size:11.5pt;letter-spacing:.12em;margin-bottom:3mm}
@@ -442,12 +574,11 @@ export function buildStandaloneExamHtml(
   .gk-title{font-size:14.5pt;line-height:1.5;color:#000}
   .gk-subject{font-family:"SimHei","Heiti SC","Noto Sans SC","Microsoft YaHei",sans-serif;font-size:21pt;font-weight:700;letter-spacing:.18em;margin-top:1.5mm;color:#000}
   .gk-answer-header{text-align:center;font-family:"SimHei","Heiti SC","Noto Sans SC","Microsoft YaHei",sans-serif;font-size:14.5pt;font-weight:700;margin-bottom:5mm}
-  .gk-notice{margin:3mm 0 6mm;font-size:10.5pt;line-height:1.7}
+  .gk-notice{margin:3mm 0 4mm;font-size:10.5pt;line-height:1.7}
   .gk-notice ol{margin:1mm 0 0;padding-left:1.8em}
-  .exam-section{margin-top:4mm}
-  h2.ustc-section{font-size:11pt;font-weight:400;margin:4mm 0 2.5mm;color:#000;line-height:1.6}
-  h2.gk-section{font-family:"SimHei","Heiti SC","Noto Sans SC","Microsoft YaHei",sans-serif;font-size:11.5pt;font-weight:700;margin:4.5mm 0 2.5mm;color:#000}
-  .q-item{display:grid;grid-template-columns:2.35em minmax(0,1fr);align-items:baseline;margin-bottom:4mm}
+  h2.ustc-section{font-size:11pt;font-weight:400;margin:2mm 0 0;color:#000;line-height:1.6}
+  h2.gk-section{font-family:"SimHei","Heiti SC","Noto Sans SC","Microsoft YaHei",sans-serif;font-size:11.5pt;font-weight:700;margin:2mm 0 0;color:#000}
+  .q-item{display:grid;grid-template-columns:2.35em minmax(0,1fr);align-items:baseline}
   .q-num{font-weight:400;color:#000;user-select:none}
   .q-body{min-width:0}
   .stem{color:#000}
@@ -473,18 +604,14 @@ export function buildStandaloneExamHtml(
   .rich-math table{border-collapse:collapse;margin:0.6em auto}
   .rich-math th,.rich-math td{border:0.75pt solid #000;padding:4px 10px;text-align:center}
   .answer-space{height:${writeSpace}}
-  .screen-footer{margin-top:10mm;text-align:center;font-size:9.5pt;color:#666666}
-  @page{size:A4 portrait;margin:23mm 20mm 22mm ${pageLeftMargin};@bottom-center{content:"${printFooterPrefix}" counter(page) " 页（共 " counter(pages) " 页）";font-family:"SimSun","Songti SC","Noto Serif CJK SC",serif;font-size:9.5pt;color:#666666}}
+  .page-footer{margin-top:auto;padding-top:6mm;text-align:center;font-size:9.5pt;color:#666666}
+  @page{size:A4 portrait;margin:0}
   @media print{
-    body{background:#fff;padding:0}
-    .sheet{width:auto;min-height:auto;margin:0;box-shadow:none;padding:0 !important;break-after:page}
-    .sheet:last-child{break-after:auto}
-    .ustc-binding-svg{position:fixed;left:-${pageLeftMargin};top:-23mm;width:28mm;height:297mm}
-    .screen-footer{display:none}
-    .q-item{break-inside:avoid}
-    h2{break-after:avoid}
+    body{background:#fff;padding:0;margin:0}
+    .sheet{width:210mm;min-height:297mm;margin:0;box-shadow:none;break-after:page;page-break-after:always}
+    .sheet:last-child{break-after:auto;page-break-after:auto}
   }
-  </style></head><body>${pagesHtml}</body></html>`
+  </style></head><body>${outputsHtml}<main id="paginated-root"></main>${paginationScript}</body></html>`
 }
 
 /**
@@ -496,14 +623,15 @@ export function printExamViaIframe(standaloneHtml: string): void {
   iframe.style.position = 'fixed'
   iframe.style.right = '0'
   iframe.style.bottom = '0'
-  iframe.style.width = '0'
-  iframe.style.height = '0'
+  iframe.style.width = '794px'
+  iframe.style.height = '1123px'
   iframe.style.border = '0'
-  iframe.style.visibility = 'hidden'
+  iframe.style.opacity = '0'
+  iframe.style.pointerEvents = 'none'
   document.body.appendChild(iframe)
 
   const doc = iframe.contentDocument
-  const win = iframe.contentWindow
+  const win = iframe.contentWindow as (Window & { __dshPaginatedReady?: Promise<void> }) | null
   if (!doc || !win) {
     iframe.remove()
     window.print()
@@ -543,11 +671,8 @@ export function printExamViaIframe(standaloneHtml: string): void {
     window.setTimeout(cleanup, 60_000)
   }
 
-  if (doc.fonts?.ready) {
-    void doc.fonts.ready.then(() => window.setTimeout(triggerPrint, 120))
-  } else {
-    window.setTimeout(triggerPrint, 250)
-  }
+  const ready = win.__dshPaginatedReady ?? (doc.fonts?.ready ? doc.fonts.ready.then(() => undefined) : Promise.resolve())
+  void ready.then(() => window.setTimeout(triggerPrint, 120))
 }
 
 /**
