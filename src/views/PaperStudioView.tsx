@@ -995,7 +995,7 @@ export function PaperStudioView() {
                               )}
 
                               {showSolutions ? (
-                                <div className="mt-2.5 rounded-r-lg border-l-[2.5px] border-[#2558B8] bg-[#FAF9F6] px-3.5 py-2.5 space-y-1.5 text-[14px]">
+                                <div className="mt-2.5 pl-1 space-y-1.5 text-[14.5px]">
                                   {shouldShowAnswerLine(q) && (
                                     <div>
                                       <strong className="exam-header-title">答案：</strong>
@@ -1017,7 +1017,7 @@ export function PaperStudioView() {
                                     </div>
                                   )}
                                   {comment && (
-                                    <div className="text-[#C01C28] pt-1 text-[13.5px]">
+                                    <div className="text-[#C01C28] pt-1 text-[14px]">
                                       <strong>点评：</strong>
                                       <RichMath text={comment} className="inline-block" />
                                     </div>

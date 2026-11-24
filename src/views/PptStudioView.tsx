@@ -8,7 +8,6 @@ import {
   Loader2,
   Maximize2,
   Minimize2,
-  Palette,
   Presentation,
   StickyNote,
 } from 'lucide-react'
@@ -18,10 +17,13 @@ import type { GeneratedSlide, PptTheme } from '../engine/pptxEngine'
 export function PptStudioView() {
   const { papers, activePaper, setActivePaperId, setActiveTab, showToast } = useStudy()
 
-  const [themeId, setThemeId] = useState('review-classic')
-  const [themes, setThemes] = useState<PptTheme[]>([])
   const [slides, setSlides] = useState<GeneratedSlide[]>([])
   const [activeTheme, setActiveTheme] = useState<PptTheme | null>(null)
+  const [activeAssets, setActiveAssets] = useState<{
+    bgContent: string | null
+    iconQuestion: string | null
+    iconSolution: string | null
+  }>({ bgContent: null, iconQuestion: null, iconSolution: null })
   const [currentIdx, setCurrentIdx] = useState(0)
   const [direction, setDirection] = useState(1)
   const [building, setBuilding] = useState(false)
@@ -39,11 +41,11 @@ export function PptStudioView() {
 
     import('../engine/pptxEngine')
       .then(async mod => {
-        if (!cancelled) setThemes(mod.PPT_THEMES)
-        const res = await mod.generateSlidesForPaper(activePaper, themeId)
+        const res = await mod.generateSlidesForPaper(activePaper)
         if (!cancelled) {
           setSlides(res.slides)
           setActiveTheme(res.theme)
+          setActiveAssets(res.assets)
           setCurrentIdx(0)
         }
       })
@@ -57,7 +59,7 @@ export function PptStudioView() {
     return () => {
       cancelled = true
     }
-  }, [activePaper, themeId, showToast])
+  }, [activePaper, showToast])
 
   const goTo = useCallback(
     (next: number) => {
@@ -93,10 +95,10 @@ export function PptStudioView() {
     setExporting({ current: 0, total: slides.length })
     try {
       const mod = await import('../engine/pptxEngine')
-      await mod.exportSlidesToPptx(activePaper, slides, activeTheme, (current, total) => {
+      await mod.exportSlidesToPptx(activePaper, slides, activeTheme, activeAssets, (current, total) => {
         setExporting({ current, total })
       })
-      showToast(`已成功导出讲评课件（共 ${slides.length} 页，含演讲者备注）`, 'success')
+      showToast(`已导出经典讲评 PPT（共 ${slides.length} 页，含演讲者备注）`, 'success')
     } catch (err) {
       showToast(`PPTX 导出失败：${err instanceof Error ? err.message : String(err)}`, 'error')
     } finally {
@@ -106,20 +108,20 @@ export function PptStudioView() {
 
   if (!papers.length) {
     return (
-      <div className="mx-auto max-w-xl px-4 py-16 text-center space-y-5 pb-28">
-        <div className="mx-auto w-56 overflow-hidden rounded-2xl border border-[var(--border-hairline)] bg-[var(--bg-paper)] p-2 shadow-sm">
-          <img src="./images/study-vignette.svg" alt="讲评课件工坊" className="aspect-[4/3] w-full rounded-xl object-cover" />
+      <div className="mx-auto max-w-lg px-5 py-20 text-center space-y-5 pb-28">
+        <div className="mx-auto w-52 overflow-hidden rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-paper)] p-1.5">
+          <img src="./images/study-vignette.svg" alt="讲评课件" className="aspect-[4/3] w-full rounded object-cover" />
         </div>
-        <h2 className="font-editorial text-2xl font-semibold">先组装一份试卷，即刻生成 16:9 讲评 PPTX</h2>
+        <h2 className="font-editorial text-2xl font-medium">先在试卷工坊组卷</h2>
         <p className="text-sm text-[var(--ink-secondary)] leading-relaxed">
-          每一道题自动生成「作答页」与「详解讲评页」，内置流线型题目进度轨道、MathJax 矢量公式排版、长解析智能分页及完整演讲者备注。
+          沿用 dsh-study 原版 review-classic 模板，自动生成封面、作答页与分页解析页，并写入演讲者备注。
         </p>
         <button
           type="button"
           onClick={() => setActiveTab('paper')}
-          className="inline-flex items-center gap-2 rounded-full bg-[var(--ink-primary)] px-6 py-2.5 text-sm font-medium text-[var(--bg-paper)] cursor-pointer"
+          className="inline-flex items-center gap-2 rounded-md bg-[var(--ink-primary)] px-5 py-2 text-xs font-medium text-[var(--bg-paper)] cursor-pointer"
         >
-          <FileText className="h-4 w-4" /> 前往试卷工坊组卷
+          <FileText className="h-3.5 w-3.5" /> 前往出卷
         </button>
       </div>
     )
@@ -128,16 +130,16 @@ export function PptStudioView() {
   const currentSlide = slides[currentIdx]
 
   return (
-    <div className="mx-auto max-w-[1320px] px-4 sm:px-6 py-6 pb-28 md:pb-16 space-y-5">
-      {/* Top Controls Bar */}
-      <div className="paper-card rounded-2xl p-3.5 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2.5">
+    <div className="mx-auto max-w-[1240px] px-4 sm:px-6 py-6 pb-28 md:pb-16 space-y-5">
+      {/* Quiet Top Control Strip */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[var(--border-hairline)] pb-4">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <Presentation className="h-4 w-4 text-[var(--accent)]" />
+            <Presentation className="h-4 w-4 text-[var(--ink-secondary)]" />
             <select
               value={activePaper?.paper_id ?? ''}
               onChange={e => setActivePaperId(e.target.value)}
-              className="max-w-[260px] sm:max-w-xs rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-canvas)] px-3 py-1.5 text-xs font-medium text-[var(--ink-primary)]"
+              className="max-w-[260px] sm:max-w-sm rounded-md border border-[var(--border-hairline)] bg-[var(--bg-paper)] px-3 py-1.5 text-xs font-medium text-[var(--ink-primary)]"
             >
               {papers.map(p => (
                 <option key={p.paper_id} value={p.paper_id}>
@@ -147,52 +149,29 @@ export function PptStudioView() {
             </select>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <Palette className="h-3.5 w-3.5 text-[var(--ink-muted)]" />
-            <div className="inline-flex rounded-xl bg-[var(--bg-subtle)] p-0.5 text-xs">
-              {(themes.length
-                ? themes
-                : [
-                    { id: 'review-classic', name: '典雅纸韵' },
-                    { id: 'typora-ink', name: '墨韵极简' },
-                    { id: 'botanical-sage', name: '青瓷书院' },
-                  ]
-              ).map(t => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setThemeId(t.id)}
-                  className={`rounded-lg px-2.5 py-1 transition-colors cursor-pointer ${
-                    themeId === t.id
-                      ? 'bg-[var(--bg-paper)] text-[var(--ink-primary)] font-medium shadow-xs'
-                      : 'text-[var(--ink-secondary)]'
-                  }`}
-                >
-                  {t.name.split(' · ')[0]}
-                </button>
-              ))}
-            </div>
-          </div>
+          <span className="font-mono-num text-[11.5px] text-[var(--ink-muted)]">
+            模板：review-classic（dsh-study 原版）
+          </span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setShowNotes(v => !v)}
-            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs cursor-pointer transition-colors ${
               showNotes
-                ? 'border-[var(--accent-border)] bg-[var(--accent-soft)] text-[var(--accent)]'
-                : 'border-[var(--border-hairline)] bg-[var(--bg-canvas)] text-[var(--ink-secondary)]'
+                ? 'border-[var(--border-strong)] bg-[var(--bg-subtle)] text-[var(--ink-primary)]'
+                : 'border-[var(--border-hairline)] bg-[var(--bg-paper)] text-[var(--ink-secondary)]'
             }`}
           >
-            <StickyNote className="h-3.5 w-3.5" /> 演讲者备注
+            <StickyNote className="h-3.5 w-3.5" /> 备注
           </button>
 
           <button
             type="button"
             disabled={!slides.length}
             onClick={() => setFullscreen(true)}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--border-hairline)] bg-[var(--bg-canvas)] px-3 py-1.5 text-xs text-[var(--ink-primary)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-md border border-[var(--border-hairline)] bg-[var(--bg-paper)] px-3 py-1.5 text-xs text-[var(--ink-primary)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 cursor-pointer"
           >
             <Maximize2 className="h-3.5 w-3.5" /> 全屏放映
           </button>
@@ -201,12 +180,12 @@ export function PptStudioView() {
             type="button"
             disabled={!slides.length || Boolean(exporting) || building}
             onClick={() => void handleExportPptx()}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--ink-primary)] px-4 py-1.5 text-xs font-medium text-[var(--bg-paper)] disabled:opacity-45 hover:opacity-92 cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-md bg-[var(--ink-primary)] px-4 py-1.5 text-xs font-medium text-[var(--bg-paper)] disabled:opacity-45 hover:opacity-90 cursor-pointer"
           >
             {exporting ? (
               <>
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                正在打包 ({exporting.current}/{exporting.total})
+                打包中 ({exporting.current}/{exporting.total})
               </>
             ) : (
               <>
@@ -217,37 +196,36 @@ export function PptStudioView() {
         </div>
       </div>
 
-      {/* Main 16:9 Interactive Slide Stage */}
-      <div className="paper-card rounded-2xl p-3 sm:p-5 space-y-4">
-        <div className="group relative aspect-[16/9] w-full overflow-hidden rounded-xl border border-[var(--border-hairline)] bg-[#FAF9F5] shadow-md">
+      {/* Main 16:9 Verbatim Slide Stage */}
+      <div className="space-y-4">
+        <div className="group relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-[var(--border-hairline)] bg-[#FAF9F5] shadow-[var(--shadow-sheet)]">
           {building ? (
             <div className="flex h-full flex-col items-center justify-center gap-3 text-sm text-[var(--ink-secondary)]">
-              <Loader2 className="h-7 w-7 animate-spin text-[var(--accent)]" />
-              <span>正在通过 MathJax 矢量混排引擎渲染幻灯片…</span>
+              <Loader2 className="h-6 w-6 animate-spin text-[var(--accent)]" />
+              <span>正在排版讲评幻灯片…</span>
             </div>
           ) : currentSlide ? (
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
-                key={`${themeId}-${currentSlide.index}`}
+                key={`slide-${currentSlide.index}`}
                 custom={direction}
-                initial={{ opacity: 0, x: direction > 0 ? 28 : -28 }}
+                initial={{ opacity: 0, x: direction > 0 ? 24 : -24 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: direction > 0 ? -28 : 28 }}
-                transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+                exit={{ opacity: 0, x: direction > 0 ? -24 : 24 }}
+                transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
                 className="h-full w-full [&>svg]:h-full [&>svg]:w-full"
                 dangerouslySetInnerHTML={{ __html: currentSlide.svg }}
               />
             </AnimatePresence>
           ) : null}
 
-          {/* Hover-only subtle arrows so text near slide edges is never obstructed */}
           {slides.length > 1 && (
             <>
               <button
                 type="button"
                 disabled={currentIdx === 0}
                 onClick={() => goTo(currentIdx - 1)}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 dark:bg-black/55 backdrop-blur-md border border-black/10 text-neutral-800 dark:text-white shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-0 transition-opacity cursor-pointer"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 backdrop-blur-md border border-black/10 text-neutral-800 shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-0 transition-opacity cursor-pointer"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -255,7 +233,7 @@ export function PptStudioView() {
                 type="button"
                 disabled={currentIdx === slides.length - 1}
                 onClick={() => goTo(currentIdx + 1)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 dark:bg-black/55 backdrop-blur-md border border-black/10 text-neutral-800 dark:text-white shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-0 transition-opacity cursor-pointer"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 backdrop-blur-md border border-black/10 text-neutral-800 shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-0 transition-opacity cursor-pointer"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -263,7 +241,7 @@ export function PptStudioView() {
           )}
         </div>
 
-        {/* Slide Meta + Dedicated Prev/Next Controls + Filmstrip Thumbnails */}
+        {/* Dedicated Controls + Filmstrip */}
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--ink-secondary)]">
           <span className="font-medium text-[var(--ink-primary)]">
             {currentSlide?.title ?? '—'}
@@ -273,7 +251,7 @@ export function PptStudioView() {
               type="button"
               disabled={currentIdx === 0}
               onClick={() => goTo(currentIdx - 1)}
-              className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-canvas)] px-2.5 py-1 text-xs disabled:opacity-35 hover:bg-[var(--bg-subtle)] cursor-pointer"
+              className="inline-flex items-center gap-1 rounded-md border border-[var(--border-hairline)] bg-[var(--bg-paper)] px-2.5 py-1 text-xs disabled:opacity-35 hover:bg-[var(--bg-subtle)] cursor-pointer"
             >
               <ChevronLeft className="h-3.5 w-3.5" /> 上一页
             </button>
@@ -284,7 +262,7 @@ export function PptStudioView() {
               type="button"
               disabled={currentIdx === slides.length - 1}
               onClick={() => goTo(currentIdx + 1)}
-              className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-hairline)] bg-[var(--bg-canvas)] px-2.5 py-1 text-xs disabled:opacity-35 hover:bg-[var(--bg-subtle)] cursor-pointer"
+              className="inline-flex items-center gap-1 rounded-md border border-[var(--border-hairline)] bg-[var(--bg-paper)] px-2.5 py-1 text-xs disabled:opacity-35 hover:bg-[var(--bg-subtle)] cursor-pointer"
             >
               下一页 <ChevronRight className="h-3.5 w-3.5" />
             </button>
@@ -300,17 +278,17 @@ export function PptStudioView() {
                   key={s.index}
                   type="button"
                   onClick={() => goTo(idx)}
-                  className={`shrink-0 w-36 text-left rounded-xl border p-1.5 transition-all cursor-pointer ${
+                  className={`shrink-0 w-36 text-left rounded-md border p-1 transition-all cursor-pointer ${
                     active
-                      ? 'border-[var(--accent)] bg-[var(--accent-soft)] ring-1 ring-[var(--accent-border)]'
-                      : 'border-[var(--border-hairline)] bg-[var(--bg-canvas)] hover:border-[var(--border-strong)]'
+                      ? 'border-[var(--ink-primary)] bg-[var(--bg-paper)]'
+                      : 'border-[var(--border-hairline)] bg-[var(--bg-paper)]/60 hover:border-[var(--border-strong)] opacity-80 hover:opacity-100'
                   }`}
                 >
                   <div
-                    className="aspect-[16/9] w-full overflow-hidden rounded-lg bg-[#FAF9F5] [&>svg]:h-full [&>svg]:w-full"
+                    className="aspect-[16/9] w-full overflow-hidden rounded-xs bg-[#FAF9F5] [&>svg]:h-full [&>svg]:w-full"
                     dangerouslySetInnerHTML={{ __html: s.svg }}
                   />
-                  <div className="mt-1 truncate text-[10.5px] font-medium text-[var(--ink-secondary)]">
+                  <div className="mt-1 truncate text-[10.5px] text-[var(--ink-secondary)]">
                     {idx + 1}. {s.title}
                   </div>
                 </button>
@@ -320,19 +298,16 @@ export function PptStudioView() {
         )}
       </div>
 
-      {/* Speaker Notes Panel */}
+      {/* Speaker Notes */}
       <AnimatePresence>
         {showNotes && currentSlide?.notes && (
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            className="paper-card rounded-2xl p-4 sm:p-5 space-y-2"
+            exit={{ opacity: 0, y: 6 }}
+            className="border-t border-[var(--border-hairline)] pt-4 space-y-2"
           >
-            <div className="flex items-center gap-2 text-xs font-semibold text-[var(--ink-muted)]">
-              <StickyNote className="h-3.5 w-3.5 text-[var(--amber)]" />
-              演讲者备注（将自动写入导出 .pptx 的 Speaker Notes）
-            </div>
+            <div className="text-xs font-medium text-[var(--ink-muted)]">演讲者备注（Speaker Notes）</div>
             <pre className="whitespace-pre-wrap font-sans text-xs sm:text-[13px] leading-relaxed text-[var(--ink-secondary)]">
               {currentSlide.notes}
             </pre>
@@ -340,7 +315,7 @@ export function PptStudioView() {
         )}
       </AnimatePresence>
 
-      {/* Fullscreen Presenter Overlay */}
+      {/* Fullscreen Presenter */}
       <AnimatePresence>
         {fullscreen && currentSlide && (
           <motion.div
@@ -362,7 +337,7 @@ export function PptStudioView() {
               </button>
             </div>
 
-            <div className="relative w-full max-w-6xl aspect-[16/9] overflow-hidden rounded-xl shadow-2xl">
+            <div className="relative w-full max-w-6xl aspect-[16/9] overflow-hidden rounded-lg shadow-2xl">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={`fs-${currentSlide.index}`}

@@ -5,6 +5,7 @@ import { AllPackages } from 'mathjax-full/js/input/tex/AllPackages.js'
 import { SVG } from 'mathjax-full/js/output/svg.js'
 import { liteAdaptor } from 'mathjax-full/js/adaptors/liteAdaptor.js'
 import { RegisterHTMLHandler } from 'mathjax-full/js/handlers/html.js'
+import reviewClassicTemplate from '../templates/ppt/review-classic/template.json'
 import type { SavedPaper } from '../types/study'
 import { originLabel, typeLabel } from './paperAssembler'
 import {
@@ -15,7 +16,7 @@ import {
   stripMathDelimiters,
 } from './examRenderer'
 
-// Initialize browser MathJax TeX -> SVG compiler once
+// Verbatim dsh-study PPT engine (review-classic template — unmodified theme, assets, and geometry)
 const adaptor = liteAdaptor()
 RegisterHTMLHandler(adaptor)
 const mathDocument = mathjax.document('', {
@@ -24,8 +25,6 @@ const mathDocument = mathjax.document('', {
 })
 
 export interface PptTheme {
-  id: string
-  name: string
   background: string
   text: string
   body: string
@@ -36,53 +35,22 @@ export interface PptTheme {
   railMuted: string
 }
 
-export const PPT_THEMES: PptTheme[] = [
-  {
-    id: 'review-classic',
-    name: '典雅纸韵 · 经典讲评',
-    background: 'FAF9F5',
-    text: '15181E',
-    body: '2B2F36',
-    accent: '2558B8',
-    highlight: 'B46519',
-    muted: '6B6F76',
-    border: 'DAD7CE',
-    railMuted: 'B9B6AC',
-  },
-  {
-    id: 'typora-ink',
-    name: '墨韵极简 · 深夜讲堂',
-    background: '181A1F',
-    text: 'F3F1EC',
-    body: 'D6D9E0',
-    accent: '6C9EFF',
-    highlight: 'E5A44E',
-    muted: '8B919E',
-    border: '2F3440',
-    railMuted: '4A5161',
-  },
-  {
-    id: 'botanical-sage',
-    name: '青瓷书院 · 温润护眼',
-    background: 'F6F8F5',
-    text: '18241F',
-    body: '2C3B34',
-    accent: '236B52',
-    highlight: 'B0621B',
-    muted: '66776F',
-    border: 'D4DDD6',
-    railMuted: 'A9B8AE',
-  },
-]
+export const REVIEW_CLASSIC_TEMPLATE = reviewClassicTemplate
 
 const SLIDE_W = 1280
 const SLIDE_H = 720
 const PX_PER_IN = 96
 const BODY_X = 56
-const BODY_W = 1168
+const BODY_W = 1136
 
-const CJK_BOLD = '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif'
-const CJK_REG = '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif'
+const CJK_BOLD = '"Noto Sans SC", "PingFang SC", "Noto Sans CJK SC", "DengXian", "Microsoft YaHei", "SimHei", sans-serif'
+const CJK_REG = '"Noto Sans SC", "PingFang SC", "Noto Sans CJK SC", "DengXian", "Microsoft YaHei", "SimHei", sans-serif'
+
+interface PptAssets {
+  bgContent: string | null
+  iconQuestion: string | null
+  iconSolution: string | null
+}
 
 interface FormulaMetrics {
   viewBox: string
@@ -101,6 +69,7 @@ interface RichPage {
 
 type SceneItem =
   | { type: 'bg-image'; data: string }
+  | { type: 'pic'; x: number; y: number; w: number; h: number; data: string }
   | { type: 'poly'; points: [number, number][]; fill?: string; stroke?: string; strokeWidth?: number }
   | { type: 'line'; x1: number; y1: number; x2: number; y2: number; color: string; width: number; dash?: string }
   | { type: 'dot'; cx: number; cy: number; r: number; fill?: string; stroke?: string; strokeWidth?: number }
@@ -444,7 +413,7 @@ function renderLinesToSvg(lines: LaidOutLine[], maxWidth: number): RichPage {
     let textBuf: { x: number; text: string; color: string; bold: boolean; fontSize: number } | null = null
     const flushText = () => {
       if (!textBuf) return
-      const weight = textBuf.bold ? ' font-weight="600"' : ''
+      const weight = textBuf.bold ? ' font-weight="700"' : ''
       chunks.push(
         `<text x="${textBuf.x.toFixed(1)}" y="${baseline.toFixed(1)}" font-family='${textBuf.bold ? CJK_BOLD : CJK_REG}'${weight} font-size="${textBuf.fontSize}" fill="#${textBuf.color}">${escapeHtml(textBuf.text)}</text>`,
       )
@@ -573,15 +542,16 @@ function buildRouteRail(theme: PptTheme, mark: string, number: number, total: nu
   return items
 }
 
-function coverScene(theme: PptTheme, kicker: string, title: string, subtitle: string): SceneItem[] {
+// Exact coverScene from dsh-study/src/host/render.js
+function coverScene(theme: PptTheme, kicker: string, title: string, assets: PptAssets): SceneItem[] {
   const tint = (t: number) => mixHex(theme.accent, t, theme.background)
   const p: Record<string, [number, number]> = {
     A: [1280, 0], B: [1010, 0], C: [1150, 150], D: [1280, 260], E: [960, 250], F: [1080, 380],
     G: [1280, 470], H: [900, 470], I: [1010, 600], J: [1280, 720], K: [880, 720], L: [1160, 560],
   }
   const facets: [string, number][] = [
-    ['BCA', 0.1], ['ACD', 0.22], ['BEC', 0.05], ['CEF', 0.34], ['CFD', 0.14], ['DFG', 0.07], ['EHF', 0.18],
-    ['FHI', 0.06], ['FIL', 0.88], ['FLG', 0.26], ['GLJ', 0.12], ['LIJ', 0.2], ['IKJ', 0.09], ['HKI', 0.05],
+    ['BCA', 0.1], ['ACD', 0.24], ['BEC', 0.05], ['CEF', 0.36], ['CFD', 0.14], ['DFG', 0.07], ['EHF', 0.18],
+    ['FHI', 0.06], ['FIL', 1], ['FLG', 0.28], ['GLJ', 0.12], ['LIJ', 0.2], ['IKJ', 0.09], ['HKI', 0.05],
   ]
   const items: SceneItem[] = facets.map(([keys, t]) => ({
     type: 'poly',
@@ -598,27 +568,31 @@ function coverScene(theme: PptTheme, kicker: string, title: string, subtitle: st
     })),
   )
 
-  const titleLines = wrapByWidth(title, 46, 700, 3)
-  const lineHeight = 62
-  const blockH = 44 + 22 + titleLines.length * lineHeight + 56
-  const startY = Math.round((SLIDE_H - blockH) / 2) - 10
-  const titleY = startY + 50
-  const railY = titleY + titleLines.length * lineHeight + 28
+  const titleLines = wrapByWidth(title, 48, 700, 3)
+  const lineHeight = 64
+  const blockH = 44 + 22 + titleLines.length * lineHeight + 36 + 16
+  const startY = Math.round((SLIDE_H - blockH) / 2) - 6
+  const titleY = startY + 54
+  const railY = titleY + titleLines.length * lineHeight + 36
 
+  if (assets.iconQuestion) {
+    items.push({ type: 'pic', x: 96, y: startY, w: 32, h: 32, data: assets.iconQuestion })
+  } else {
+    items.push({ type: 'poly', points: [[96, startY + 11], [106, startY + 11], [106, startY + 21], [96, startY + 21]], fill: theme.accent })
+  }
   items.push(
-    { type: 'poly', points: [[96, startY + 10], [108, startY + 10], [108, startY + 22], [96, startY + 22]], fill: theme.accent },
-    { type: 'text', x: 124, y: startY, w: 560, h: 32, text: kicker, size: 16, bold: true, role: 'kicker', color: theme.accent, spacing: 3.2 },
-    { type: 'text', x: 96, y: titleY, w: 740, h: titleLines.length * lineHeight, lines: titleLines, lineHeight, size: 46, bold: true, role: 'display', color: theme.text, valign: 'top' },
+    { type: 'text', x: 140, y: startY, w: 560, h: 32, text: kicker, size: 17, bold: true, role: 'kicker', color: theme.accent, spacing: 3.5 },
+    { type: 'text', x: 96, y: titleY, w: 740, h: titleLines.length * lineHeight, lines: titleLines, lineHeight, size: 48, bold: true, role: 'display', color: theme.text, valign: 'top' },
     { type: 'line', x1: 96, y1: railY, x2: 162, y2: railY, color: theme.accent, width: 2 },
-    { type: 'line', x1: 184, y1: railY, x2: 344, y2: railY, color: theme.railMuted, width: 1.2, dash: 'dash' },
+    { type: 'line', x1: 184, y1: railY, x2: 332, y2: railY, color: theme.railMuted, width: 1.2, dash: 'dash' },
     { type: 'dot', cx: 173, cy: railY, r: 8, fill: theme.background, stroke: theme.accent, strokeWidth: 1.8 },
     { type: 'dot', cx: 173, cy: railY, r: 3.5, fill: theme.accent },
-    { type: 'dot', cx: 350, cy: railY, r: 3.8, fill: theme.background, stroke: theme.railMuted, strokeWidth: 1.4 },
-    { type: 'text', x: 96, y: railY + 26, w: 680, h: 28, text: subtitle, size: 15, color: theme.muted },
+    { type: 'dot', cx: 338, cy: railY, r: 3.8, fill: theme.background, stroke: theme.railMuted, strokeWidth: 1.4 },
   )
   return items
 }
 
+// Exact contentScene from dsh-study/src/host/render.js
 function contentScene(
   theme: PptTheme,
   opts: {
@@ -628,22 +602,28 @@ function contentScene(
     heading: string
     aside: string
     page: RichPage
-    bgDataUri?: string | null
+    assets: PptAssets
   },
 ): SceneItem[] {
   const isSol = opts.tone === 'solution'
   const mark = isSol ? theme.highlight : theme.accent
+  const iconData = isSol ? opts.assets.iconSolution : opts.assets.iconQuestion
   const items: SceneItem[] = []
-  if (opts.bgDataUri && theme.id === 'review-classic') {
-    items.push({ type: 'bg-image', data: opts.bgDataUri })
+
+  if (opts.assets.bgContent) {
+    items.push({ type: 'bg-image', data: opts.assets.bgContent })
   }
+  if (iconData) {
+    items.push({ type: 'pic', x: BODY_X, y: 36, w: 30, h: 30, data: iconData })
+  }
+  const numX = iconData ? BODY_X + 40 : BODY_X
   items.push(
-    { type: 'text', x: BODY_X, y: 30, w: 56, h: 42, text: String(opts.number).padStart(2, '0'), size: 32, bold: true, role: 'numeral', color: mark },
-    { type: 'line', x1: BODY_X + 60, y1: 40, x2: BODY_X + 60, y2: 63, color: theme.border, width: 1.2 },
-    { type: 'text', x: BODY_X + 76, y: 32, w: 580, h: 38, text: opts.heading, size: 22, bold: true, role: 'display', color: theme.text },
+    { type: 'text', x: numX, y: 30, w: 54, h: 42, text: String(opts.number).padStart(2, '0'), size: 32, bold: true, role: 'numeral', color: mark },
+    { type: 'line', x1: numX + 58, y1: 40, x2: numX + 58, y2: 63, color: theme.border, width: 1.2 },
+    { type: 'text', x: numX + 74, y: 32, w: 560, h: 38, text: opts.heading, size: 22, bold: true, role: 'display', color: theme.text },
   )
   if (opts.aside) {
-    items.push({ type: 'text', x: 740, y: 34, w: 484, h: 34, text: opts.aside, size: 13.5, color: theme.muted, align: 'right' })
+    items.push({ type: 'text', x: 740, y: 34, w: 484, h: 34, text: opts.aside, size: 13.5, role: 'aside', color: theme.muted, align: 'right' })
   }
   items.push(...buildRouteRail(theme, mark, opts.number, opts.total, 92))
   items.push({ type: 'image', x: BODY_X, y: 124, page: opts.page })
@@ -657,9 +637,9 @@ function textItemToSvg(item: Extract<SceneItem, { type: 'text' }>): string[] {
   const top = item.valign === 'top' ? item.y : item.y + (item.h - blockH) / 2
   const anchor = item.align === 'right' ? 'end' : item.align === 'center' ? 'middle' : 'start'
   const x = item.align === 'right' ? item.x + item.w : item.align === 'center' ? item.x + item.w / 2 : item.x
-  const spacing = item.spacing ? ` letter-spacing="${item.spacing}"` : ''
+  const spacing = item.spacing ? ` letter-spacing="${item.spacing}"` : item.role === 'numeral' ? ' letter-spacing="-0.6"' : ''
   const weight = item.bold ? ' font-weight="700"' : ''
-  const fontFam = item.role === 'numeral' ? '"JetBrains Mono", Inter, sans-serif' : CJK_REG
+  const fontFam = item.role === 'numeral' ? '"Space Grotesk", "JetBrains Mono", Inter, sans-serif' : item.bold ? CJK_BOLD : CJK_REG
   return lines.map((line, i) => {
     const baseline = top + i * lh + lh / 2 + item.size * 0.35
     return `<text x="${x.toFixed(1)}" y="${baseline.toFixed(1)}" text-anchor="${anchor}" font-family='${fontFam}'${weight} font-size="${item.size}"${spacing} fill="#${item.color}">${escapeHtml(line)}</text>`
@@ -670,7 +650,9 @@ function sceneToSvg(items: SceneItem[], theme: PptTheme): string {
   const parts: string[] = [`<rect width="${SLIDE_W}" height="${SLIDE_H}" fill="#${theme.background}"/>`]
   for (const item of items) {
     if (item.type === 'bg-image') {
-      parts.push(`<image href="${item.data}" x="0" y="0" width="${SLIDE_W}" height="${SLIDE_H}" preserveAspectRatio="xMidYMid slice" opacity="0.65"/>`)
+      parts.push(`<image href="${item.data}" x="0" y="0" width="${SLIDE_W}" height="${SLIDE_H}" preserveAspectRatio="xMidYMid slice"/>`)
+    } else if (item.type === 'pic') {
+      parts.push(`<image href="${item.data}" x="${item.x}" y="${item.y}" width="${item.w}" height="${item.h}"/>`)
     } else if (item.type === 'poly') {
       const fill = item.fill ? `#${item.fill}` : 'none'
       const stroke = item.stroke ? ` stroke="#${item.stroke}" stroke-width="${item.strokeWidth ?? 1}" stroke-linejoin="round"` : ''
@@ -692,34 +674,52 @@ function sceneToSvg(items: SceneItem[], theme: PptTheme): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${SLIDE_W}" height="${SLIDE_H}" viewBox="0 0 ${SLIDE_W} ${SLIDE_H}">${parts.join('')}</svg>`
 }
 
-let cachedBgUri: string | null = null
-async function loadPaperBgDataUri(): Promise<string | null> {
-  if (cachedBgUri) return cachedBgUri
+let cachedAssets: PptAssets | null = null
+async function fetchDataUri(url: string): Promise<string | null> {
   try {
-    const res = await fetch('./images/ppt-paper-bg.jpg')
+    const res = await fetch(url)
     if (!res.ok) return null
     const blob = await res.blob()
-    cachedBgUri = await new Promise<string>((resolve, reject) => {
+    return await new Promise<string>((resolve, reject) => {
       const reader = new FileReader()
       reader.onload = () => resolve(String(reader.result))
       reader.onerror = reject
       reader.readAsDataURL(blob)
     })
-    return cachedBgUri
   } catch {
     return null
   }
 }
 
+async function loadVerbatimPptAssets(): Promise<PptAssets> {
+  if (cachedAssets) return cachedAssets
+  const base = './templates/ppt/review-classic/assets'
+  const [bgContent, iconQuestion, iconSolution] = await Promise.all([
+    fetchDataUri(`${base}/bg-content.jpg`),
+    fetchDataUri(`${base}/icon-question.png`),
+    fetchDataUri(`${base}/icon-solution.png`),
+  ])
+  cachedAssets = { bgContent, iconQuestion, iconSolution }
+  return cachedAssets
+}
+
 export async function generateSlidesForPaper(
   paper: SavedPaper,
-  themeId = 'review-classic',
-): Promise<{ slides: GeneratedSlide[]; theme: PptTheme }> {
-  const theme = PPT_THEMES.find(t => t.id === themeId) ?? PPT_THEMES[0]
-  const bgDataUri = await loadPaperBgDataUri()
+): Promise<{ slides: GeneratedSlide[]; theme: PptTheme; assets: PptAssets }> {
+  const rawTheme = reviewClassicTemplate.theme
+  const theme: PptTheme = {
+    background: stripHash(rawTheme.background),
+    text: stripHash(rawTheme.text),
+    body: stripHash(rawTheme.body),
+    accent: stripHash(rawTheme.accent),
+    highlight: stripHash(rawTheme.highlight),
+    muted: stripHash(rawTheme.muted),
+    border: stripHash(rawTheme.border),
+    railMuted: stripHash(rawTheme.railMuted),
+  }
+  const assets = await loadVerbatimPptAssets()
   const modeLabel = ({ mistake: '错题巩固', exam: '模拟测试', topic: '专题练习' } as Record<string, string>)[paper.mode] ?? '练习讲评'
   const totalQuestions = paper.items.length
-  const totalScore = paper.items.reduce((s, it) => s + Number(it.score || 0), 0)
   const slides: GeneratedSlide[] = []
 
   const pushSlide = (
@@ -734,23 +734,18 @@ export async function generateSlidesForPaper(
     })
   }
 
+  // Exact verbatim cover slide
   pushSlide(
-    coverScene(
-      theme,
-      modeLabel,
-      paper.title,
-      `共 ${totalQuestions} 题 · 总分 ${totalScore} 分 · USTC QBank Studio`,
-    ),
+    coverScene(theme, modeLabel, paper.title, assets),
     { title: paper.title, type: 'cover', questionId: null, notes: null },
   )
 
   for (const [index, item] of paper.items.entries()) {
     const q = item.question
-    const refShort = truncateText(q.source?.ref ?? '', 36)
+    const refShort = truncateText(q.source?.ref ?? '', 34)
     const badge = item.is_original_redo ? '错题重做' : ''
     const qType = typeLabel(q.type)
 
-    // Question slide(s)
     const qBlocks: RichBlock[] = [{ text: q.stem.md, color: theme.body }]
     if (q.options?.length) {
       for (const opt of q.options) {
@@ -774,7 +769,7 @@ export async function generateSlidesForPaper(
         heading: `${qType} · ${item.score} 分${suffix}`,
         aside: [badge, refShort].filter(Boolean).join('　·　'),
         page,
-        bgDataUri,
+        assets,
       })
       pushSlide(items, {
         title: `第 ${index + 1} 题 · 作答${suffix}`,
@@ -782,11 +777,10 @@ export async function generateSlidesForPaper(
         questionNumber: index + 1,
         totalQuestions,
         questionId: q.id,
-        notes: `题目出处：${q.source?.ref || '未标注'}\n知识点：${(q.tags?.kp_ids ?? []).join('、')}`,
+        notes: null,
       })
     }
 
-    // Solution slide(s)
     const solBlocks: RichBlock[] = []
     if (shouldShowAnswerLine(q)) {
       solBlocks.push({ label: '【答案】', labelColor: theme.highlight, text: q.answer.md, color: theme.body })
@@ -830,7 +824,7 @@ export async function generateSlidesForPaper(
         heading: `解析 · ${qType}${suffix}`,
         aside: refShort,
         page,
-        bgDataUri,
+        assets,
       })
       pushSlide(items, {
         title: `第 ${index + 1} 题 · 解析${pageIdx > 0 ? ` (${pageIdx + 1})` : ''}`,
@@ -843,7 +837,7 @@ export async function generateSlidesForPaper(
     }
   }
 
-  return { slides, theme }
+  return { slides, theme, assets }
 }
 
 async function svgStringToPngDataUrl(svgString: string, widthPx: number, heightPx: number, scale = 2): Promise<string> {
@@ -872,26 +866,36 @@ export async function exportSlidesToPptx(
   paper: SavedPaper,
   slides: GeneratedSlide[],
   theme: PptTheme,
+  assets: PptAssets,
   onProgress?: (current: number, total: number) => void,
 ): Promise<void> {
   const pptx = new PptxGenJS()
   pptx.layout = 'LAYOUT_WIDE'
-  pptx.author = 'USTC QBank Studio'
+  pptx.author = 'dsh-study'
   pptx.subject = '课程讲评与错题复盘'
   pptx.title = paper.title
+  pptx.company = 'dsh-study'
   const inch = (px: number) => px / PX_PER_IN
+
+  if (assets.bgContent) {
+    pptx.defineSlideMaster({
+      title: 'DSH_CONTENT',
+      background: { data: assets.bgContent },
+    })
+  }
 
   for (let i = 0; i < slides.length; i++) {
     onProgress?.(i + 1, slides.length)
     const s = slides[i]
-    const slide = pptx.addSlide()
-    slide.background = { color: theme.background }
-    // Render crisp 2x retina PNG from the unified scene SVG (contains vector MathJax equations & paper texture)
+    const useContentMaster = Boolean(assets.bgContent && s.items.some(it => it.type === 'bg-image'))
+    const slide = useContentMaster ? pptx.addSlide({ masterName: 'DSH_CONTENT' }) : pptx.addSlide()
+    if (!useContentMaster) slide.background = { color: theme.background }
+
     const pngData = await svgStringToPngDataUrl(s.svg, SLIDE_W, SLIDE_H, 2)
     slide.addImage({ data: pngData, x: 0, y: 0, w: inch(SLIDE_W), h: inch(SLIDE_H) })
     if (s.notes) slide.addNotes(s.notes)
   }
 
-  const safeTitle = paper.title.replace(/[\\/:*?"<>|]/g, '_').slice(0, 60) || 'review-slides'
+  const safeTitle = paper.title.replace(/[\\/:*?"<>|]/g, '_').slice(0, 60) || 'review'
   await pptx.writeFile({ fileName: `${safeTitle}.pptx` })
 }

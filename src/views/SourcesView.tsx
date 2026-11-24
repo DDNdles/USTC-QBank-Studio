@@ -100,14 +100,11 @@ export function SourcesView() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <div className="font-mono-num text-[11px] uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-            SOURCE & SYNC MANAGER
-          </div>
-          <h1 className="font-editorial text-2xl sm:text-3xl font-semibold text-[var(--ink-primary)] mt-1">
-            题库源与离线同步
+          <h1 className="font-editorial text-2xl sm:text-3xl font-medium text-[var(--ink-primary)]">
+            题库源与同步
           </h1>
           <p className="text-xs sm:text-sm text-[var(--ink-secondary)] mt-1">
-            所有题库按需同步至浏览器 IndexedDB，并执行 Web Crypto SHA-256 完整性校验，断网后照常组卷出 PPT。
+            按课程同步至浏览器 IndexedDB，经 SHA-256 校验后离线可用。
           </p>
         </div>
 

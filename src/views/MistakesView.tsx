@@ -107,11 +107,8 @@ export function MistakesView({
       {/* Header & Telemetry */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <div className="font-mono-num text-[11px] uppercase tracking-[0.18em] text-[var(--ink-muted)]">
-            SPACED REPETITION · SM-2
-          </div>
-          <h1 className="font-editorial text-2xl sm:text-3xl font-semibold text-[var(--ink-primary)] mt-1">
-            个人错题本与复盘
+          <h1 className="font-editorial text-2xl sm:text-3xl font-medium text-[var(--ink-primary)]">
+            错题本与复盘
           </h1>
         </div>
 

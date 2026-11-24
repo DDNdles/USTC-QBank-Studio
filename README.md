@@ -25,8 +25,7 @@
      - 均支持 **「题目后附解析」** 与 **「原题与答案分开」**，可一键**打印 / 另存高清 PDF**、下载**离线独立 `.html`** 或下载完整 **XeLaTeX `.tex` 源码**。
 
 4. **经典 16:9 讲评 PPTX 制作与在线放映厅**
-   - 纯浏览器内置 `mathjax-full` 矢量公式混排 + `pptxgenjs` 打包导出，自动生成几何封面页、流线型题目进度轨道、每题「作答页 + 解析页」（长解析自动分页绝不截断）与完整演讲者备注（Speaker Notes）。
-   - 提供三套典雅配色主题（典雅纸韵 / 墨韵极简 / 青瓷书院）与全屏键盘放映模式。
+   - 原版保留 `dsh-study` 的 `review-classic` 模板（`template.json`、`bg-content.jpg`、`icon-question.png`、`icon-solution.png` 与流线型题目进度轨道），纯浏览器集成 `mathjax-full` 矢量公式混排 + `pptxgenjs` 导出 `.pptx`，支持长解析自动分页、完整演讲者备注（Speaker Notes）与全屏键盘放映模式。
 
 5. **个人错题本与 SM-2 间隔重复复习**
    - 完整实现 SM-2 记忆调度算法（重来 / 困难 / 良好 / 轻松掌握），内置今日待复习闪卡流、手工 Markdown+LaTeX 录题器，以及一键生成错题巩固卷（原题重做 + 同知识点举一反三）。

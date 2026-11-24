@@ -1,4 +1,6 @@
 import katex from 'katex'
+import ustcTemplateTex from '../templates/pdf/ustc-exam/template.tex?raw'
+import gaokaoTemplateTex from '../templates/pdf/gaokao/template.tex?raw'
 import type {
   PaperHeaderMeta,
   PaperItem,
@@ -58,7 +60,7 @@ export function cleanSectionTitle(raw: string | undefined, fallbackType?: string
   if (!text || text === '题目') return sectionTitleForType(fallbackType ?? 'solve')
   text = text
     .replace(/^(?:第\s*[一二三四五六七八九十百\d]+\s*(?:部分|大题|节)\s*[：:、.．\s]*)/u, '')
-    .replace(/^(?:[（(]\s*[一二三四五六七八九十\d]+\s*[)）]\s*[：:、.．\s]*)/u, '')
+    .replace(/^(?:[（(]\s*[一二三四五六七八九十百\d]+\s*[)）]\s*[：:、.．\s]*)/u, '')
     .replace(/^(?:[一二三四五六七八九十]+(?:\s*[、.．:：]\s*|\s+))/u, '')
     .replace(/^(?:\d+\s*[、.．:：]\s*)/u, '')
     .trim()
@@ -118,7 +120,7 @@ export function buildCommentText(item: PaperItem, question: QuestionRecord): str
     parts.push(question.quality.note)
   }
   if (question.answer?.origin === 'ai') {
-    parts.push('本题含 AI 推导参考答案，请注意核验。')
+    parts.push('本题含 AI 推导或变式，请注意核验。')
   }
   return parts.join('；')
 }
@@ -137,6 +139,11 @@ export function escapeHtml(value: string): string {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
+}
+
+function extractChoiceKey(answerMd: string | undefined): string {
+  const match = String(answerMd ?? '').match(/[A-D]{1,4}/)
+  return match ? match[0] : ''
 }
 
 function renderInlineMarkdownHtml(line: string): string {
@@ -163,7 +170,6 @@ function renderInlineMarkdownHtml(line: string): string {
 export function renderMarkdownToHtml(markdown: string): string {
   const raw = String(markdown ?? '').trim()
   if (!raw) return ''
-  // Keep multi-line $$...$$ blocks intact before paragraph splitting
   const blocks: string[] = []
   const placeholdered = raw.replace(/\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]/g, match => {
     const idx = blocks.length
@@ -209,7 +215,7 @@ export function renderMarkdownToHtml(markdown: string): string {
 }
 
 // ============================================================================
-// Standalone Printable HTML Export (USTC & Gaokao Templates)
+// Verbatim dsh-study Printable HTML (mirroring dsh-study/src/host/render.js)
 // ============================================================================
 
 export function buildStandaloneExamHtml(
@@ -220,7 +226,7 @@ export function buildStandaloneExamHtml(
   sourceMap: Record<string, SourceConfig>,
 ): string {
   const isGaokao = templateId === 'gaokao'
-  const writeHeight = { compact: '30mm', standard: '52mm', spacious: '72mm' }[fields.writeSpace] ?? '52mm'
+  const writeSpace = { compact: '3cm', standard: '5.5cm', spacious: '7cm' }[fields.writeSpace] ?? '5.5cm'
   const totalScore = paper.items.reduce((s, it) => s + Number(it.score || 0), 0)
 
   const outputs =
@@ -247,33 +253,33 @@ export function buildStandaloneExamHtml(
     .map(output => {
       const groups = groupItems(paper.items)
       let seq = 0
-      const sectionsHtml = groups
+      const sectionHtml = groups
         .map((group, secIdx) => {
           const itemsHtml = group.items
             .map(item => {
               seq++
               const q = item.question
-              const stemHtml = output.answerOnly
+              const prompt = output.answerOnly
                 ? ''
                 : `<div class="stem rich-math">${renderMarkdownToHtml(q.stem.md)}</div>${renderFigs(item, q.stem.figures)}`
-              const optsHtml =
+              const options =
                 output.answerOnly || !q.options?.length
                   ? ''
                   : `<div class="options">${q.options
-                      .map(o => `<div class="opt"><strong>${escapeHtml(o.key)}.</strong> ${renderMarkdownToHtml(o.md)}</div>`)
+                      .map(opt => `<div><strong>${escapeHtml(opt.key)}.</strong> ${renderMarkdownToHtml(opt.md)}</div>`)
                       .join('')}</div>`
               const solText = resolveSolutionText(q)
               const comment = buildCommentText(item, q)
-              const solHtml = output.showSolutions
+              const solution = output.showSolutions
                 ? `<section class="solution">
-                    ${shouldShowAnswerLine(q) ? `<div class="ans-line"><strong>答案：</strong><span class="rich-math">${renderMarkdownToHtml(q.answer.md)}</span></div>` : ''}
-                    ${solText ? `<div class="sol-body"><strong>${q.type === 'proof' ? '证明' : '解'}</strong>　<div class="rich-math">${renderMarkdownToHtml(solText)}</div>${renderFigs(item, q.solution.figures)}</div>` : ''}
+                    ${shouldShowAnswerLine(q) ? `<div class="ans-line"><strong>答案：</strong>${renderMarkdownToHtml(q.answer.md)}</div>` : ''}
+                    ${solText ? `<div class="sol-body"><strong>${q.type === 'proof' ? '证明' : '解'}</strong>　${renderMarkdownToHtml(solText)}${renderFigs(item, q.solution.figures)}</div>` : ''}
                     ${comment ? `<p class="comment"><strong>点评：</strong>${renderMarkdownToHtml(comment)}</p>` : ''}
                   </section>`
                 : q.type === 'solve' || q.type === 'proof'
-                  ? `<div class="answer-space"></div>`
+                  ? '<div class="answer-space"></div>'
                   : ''
-              return `<article class="q-item"><div class="q-no">${isGaokao ? `${seq}.` : `(${seq})`} ${output.answerOnly ? '' : `<span class="q-score">（${item.score} 分）</span>`}</div>${stemHtml}${optsHtml}${solHtml}</article>`
+              return `<article class="q-item"><div class="q-no">${isGaokao ? `${seq}.` : `(${seq})`} ${output.answerOnly ? '' : `<span class="q-score">（${item.score} 分）</span>`}</div>${prompt}${options}${solution}</article>`
             })
             .join('')
 
@@ -292,8 +298,8 @@ export function buildStandaloneExamHtml(
 
       const gaokaoNotice =
         isGaokao && !output.answerOnly
-          ? `<div class="gaokao-notice">
-              <div class="secret-mark">绝密 ★ 启用前</div>
+          ? `<div class="notice">
+              <div class="secret">绝密 ★ 启用前</div>
               <ol>
                 <li>答卷前，考生务必将自己的姓名、学号或准考证号填写清楚。</li>
                 <li>客观题请在括号内填涂正确选项；非选择题应写出必要的文字说明、证明过程或演算步骤。</li>
@@ -302,92 +308,43 @@ export function buildStandaloneExamHtml(
             </div>`
           : ''
 
-      const bindingRail =
-        !isGaokao && fields.showBindingLine && !output.answerOnly
-          ? `<aside class="binding-rail">
-              <div class="binding-student">学生所在院系：____________　姓名：__________　学号：____________</div>
-              <div class="binding-line">装订线　　答题时不要超过此线</div>
-            </aside>`
-          : ''
-
-      return `<section class="page ${!isGaokao && fields.showBindingLine && !output.answerOnly ? 'with-binding' : ''}">
-        ${bindingRail}
+      return `<section class="page">
         <header class="exam-header">
-          ${!isGaokao && fields.schoolTerm ? `<div class="school-term">${escapeHtml(fields.schoolTerm)}</div>` : ''}
+          ${!isGaokao ? `<div class="school-term">${escapeHtml(fields.schoolTerm)}</div>` : ''}
           <div class="course-title">${escapeHtml(fields.courseTitle)}${output.answerOnly ? '——参考答案与解析' : ''}</div>
-          ${!isGaokao ? `<div class="meta-line">考试时间 <u>${escapeHtml(fields.examDate)}</u>　　考试形式 <u>${escapeHtml(fields.examForm)}</u></div>` : `<div class="meta-line">科目：${escapeHtml(fields.subject)}　·　日期：${escapeHtml(fields.examDate)}</div>`}
+          ${!isGaokao ? `<div class="meta-line">考试时间 <u>${escapeHtml(fields.examDate)}</u>　　考试形式 <u>${escapeHtml(fields.examForm)}</u></div>` : ''}
         </header>
         ${gaokaoNotice}
         ${scoreTableHtml}
-        ${sectionsHtml}
-        <footer class="exam-footer">${escapeHtml(fields.footerTerm)} · 由 USTC QBank Studio 排版生成</footer>
+        ${sectionHtml}
       </section>`
     })
     .join('')
 
-  return `<!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${escapeHtml(fields.courseTitle)}</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" />
-  <style>
-    * { box-sizing: border-box; }
-    body { font-family: "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif; color: #14161a; background: #f2f0ea; margin: 0; padding: 24px 16px; line-height: 1.85; font-size: 15px; }
-    .toolbar { max-width: 820px; margin: 0 auto 14px; display: flex; justify-content: flex-end; gap: 8px; }
-    .toolbar button { font-family: system-ui, sans-serif; border: 1px solid #d4d0c7; background: #fff; color: #1c1e21; padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; }
-    .toolbar button.primary { background: #1c1e21; color: #fff; border-color: #1c1e21; }
-    .page { position: relative; background: #fff; max-width: 820px; margin: 0 auto 24px; padding: 42px 50px; box-shadow: 0 2px 16px rgba(0,0,0,.07); }
-    .page.with-binding { padding-left: 88px; }
-    .binding-rail { position: absolute; left: 0; top: 0; bottom: 0; width: 64px; border-right: 1.2px dashed #555; display: flex; align-items: center; justify-content: center; gap: 8px; color: #333; font-size: 11px; }
-    .binding-student, .binding-line { writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: 0.08em; white-space: nowrap; }
-    .binding-line { color: #555; }
-    .exam-header { text-align: center; margin-bottom: 18px; }
-    .school-term, .course-title { font-family: "Noto Sans SC", "Microsoft YaHei", "SimHei", sans-serif; font-size: 20px; font-weight: 700; line-height: 1.5; }
-    .meta-line { margin-top: 6px; font-size: 13.5px; color: #374151; }
-    .meta-line u { text-decoration: none; border-bottom: 1px solid #374151; padding: 0 16px; }
-    .gaokao-notice { border: 1px solid #d1d5db; padding: 10px 18px; margin-bottom: 18px; font-size: 13.5px; border-radius: 4px; }
-    .secret-mark { font-weight: 700; letter-spacing: 0.16em; margin-bottom: 4px; }
-    .gaokao-notice ol { margin: 4px 0 0; padding-left: 18px; }
-    table.score-table { border-collapse: collapse; margin: 14px auto 22px; font-size: 13.5px; }
-    table.score-table td { border: 1px solid #374151; padding: 5px 15px; text-align: center; min-width: 34px; }
-    h2 { font-family: "Noto Sans SC", "Microsoft YaHei", "SimHei", sans-serif; font-size: 15.5px; font-weight: 700; margin: 22px 0 12px; }
-    .q-item { margin-bottom: 16px; }
-    .q-no { font-weight: 600; margin-bottom: 4px; }
-    .q-score { font-weight: 400; color: #6b7280; font-size: 13px; }
-    .options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; margin: 8px 0 8px 18px; }
-    .q-fig { text-align: center; margin: 10px 0; }
-    .q-fig img { max-width: 72%; max-height: 220px; object-fit: contain; }
-    .solution { margin-top: 10px; padding: 10px 14px; background: #faf9f6; border-left: 2.5px solid #2558b8; }
-    .ans-line { margin-bottom: 6px; }
-    .comment { color: #c01c28; margin: 8px 0 0; }
-    .answer-space { height: ${writeHeight}; }
-    .exam-footer { text-align: center; color: #71717a; font-size: 12px; margin-top: 28px; padding-top: 12px; border-top: 1px solid #eceae4; }
-    .rich-math p { margin: 0.35em 0; }
-    .rich-math table { border-collapse: collapse; margin: 8px auto; }
-    .rich-math th, .rich-math td { border: 1px solid #4b5563; padding: 4px 10px; }
-    @media print {
-      body { background: #fff; padding: 0; }
-      .toolbar { display: none; }
-      .page { box-shadow: none; margin: 0; padding: 10mm 14mm; break-after: page; max-width: none; }
-      .page.with-binding { padding-left: 26mm; }
-      .page:last-child { break-after: auto; }
-      .q-item { break-inside: avoid; }
-    }
-  </style>
-</head>
-<body>
-  <div class="toolbar">
-    <button class="primary" onclick="window.print()">打印 / 另存 PDF</button>
-  </div>
-  ${pagesHtml}
-</body>
-</html>`
+  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css"><title>${escapeHtml(paper.title)}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"><style>
+  body{font-family:"Songti SC","Noto Serif CJK SC","SimSun","Microsoft YaHei",serif;color:#111827;background:#f3f4f6;margin:0;padding:20px;line-height:1.8;font-size:15px}
+  .page{background:#fff;max-width:820px;margin:0 auto 24px;padding:40px 48px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  .exam-header{text-align:center;margin-bottom:20px}
+  .school-term,.course-title{font-family:"Microsoft YaHei","SimHei",sans-serif;font-size:20px;font-weight:700;line-height:1.5}
+  .meta-line{margin-top:8px;font-size:14px;color:#374151}
+  .meta-line u{text-decoration:none;border-bottom:1px solid #374151;padding:0 16px}
+  .notice{border:1px solid #d1d5db;padding:10px 18px;margin-bottom:18px;font-size:13.5px}
+  .secret{font-weight:700;letter-spacing:.18em;margin-bottom:4px}
+  table.score-table{border-collapse:collapse;margin:16px auto 24px;font-size:14px}
+  table.score-table td{border:1px solid #374151;padding:6px 16px;text-align:center;min-width:34px}
+  h2{font-family:"Microsoft YaHei","SimHei",sans-serif;font-size:15.5px;font-weight:700;margin:22px 0 12px}
+  .q-item{margin-bottom:16px}.q-no{font-weight:600;margin-bottom:4px}.q-score{font-weight:400;color:#6b7280;font-size:13px}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;margin:8px 0 8px 18px}
+  .q-fig{text-align:center;margin:10px 0}.q-fig img{max-width:72%;max-height:220px;object-fit:contain}
+  .solution{margin-top:10px;padding-left:4px}.ans-line{margin-bottom:6px}.comment{color:#c01c28;margin:8px 0 0}
+  .answer-space{height:${writeSpace}}
+  @media print{body{background:#fff;padding:0}.page{box-shadow:none;margin:0;padding:12mm 16mm;break-after:page}.page:last-child{break-after:auto}.q-item{break-inside:avoid}}
+  </style></head><body>${pagesHtml}</body></html>`
 }
 
 // ============================================================================
-// LaTeX Source Generator (.tex export compatible with dsh-study ustc-exam & gaokao)
+// Verbatim dsh-study LaTeX Builder (uses unmodified template.tex files!)
 // ============================================================================
 
 function latexText(value: string): string {
@@ -407,6 +364,21 @@ function sanitizeMath(value: string): string {
   return out
 }
 
+function convertTextFormatting(text: string): string {
+  const parts = String(text ?? '').split(/(\*\*[^*]+\*\*|\*[^*\n]+\*)/g)
+  return parts
+    .map(part => {
+      if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+        return `\\textbf{${latexText(part.slice(2, -2))}}`
+      }
+      if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+        return `\\emph{${latexText(part.slice(1, -1))}}`
+      }
+      return latexText(part)
+    })
+    .join('')
+}
+
 function convertInlineLatex(text: string): string {
   return String(text ?? '')
     .split(MATH_SPLIT_RE)
@@ -419,112 +391,217 @@ function convertInlineLatex(text: string): string {
         }
         return display ? `\n\\[${math}\\]\n` : `\\(${math}\\)`
       }
-      const parts = token.split(/(\*\*[^*]+\*\*|\*[^*\n]+\*)/g)
-      return parts
-        .map(part => {
-          if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
-            return `\\textbf{${latexText(part.slice(2, -2))}}`
-          }
-          if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
-            return `\\emph{${latexText(part.slice(1, -1))}}`
-          }
-          return latexText(part)
-        })
-        .join('')
+      return convertTextFormatting(token)
     })
     .join('')
 }
 
-function renderMarkdownToLatex(markdown: string): string {
-  const raw = String(markdown ?? '').trim()
+function markdownTableToLatex(lines: string[]): string {
+  const rows = lines
+    .filter((_, idx) => idx !== 1)
+    .map(line =>
+      line
+        .replace(/^\s*\||\|\s*$/g, '')
+        .split('|')
+        .map(cell => convertInlineLatex(cell.trim())),
+    )
+    .filter(cells => cells.length > 0)
+  if (!rows.length) return ''
+  const cols = Math.max(...rows.map(r => r.length))
+  const colSpec = `|${'c|'.repeat(cols)}`
+  const body = rows
+    .map(r => {
+      const padded = [...r, ...Array(Math.max(0, cols - r.length)).fill('')]
+      return `${padded.join(' & ')} \\\\ \\hline`
+    })
+    .join('\n')
+  const inner = `\\begin{tabular}{${colSpec}}\\hline\n${body}\n\\end{tabular}`
+  return cols >= 5 ? `\\begin{center}\\resizebox{\\linewidth}{!}{${inner}}\\end{center}` : `\\begin{center}${inner}\\end{center}`
+}
+
+function renderMarkdownToLatex(markdown: string, breakInlineSubItems = false): string {
+  let raw = String(markdown ?? '').trim()
   if (!raw) return ''
+  if (breakInlineSubItems) {
+    const heavyMathCount = (raw.match(/\\(?:int|sum|lim|frac|dfrac|prod|sqrt)\b/g) ?? []).length
+    const hasSubItems = /[（(]2[）)]/.test(raw)
+    if (heavyMathCount >= 2 && hasSubItems && !raw.includes('\n')) {
+      raw = raw
+        .replace(/\s*([：:;；。])\s*([（(][1-9][）)])/g, '$1\n$2 ')
+        .replace(/^\s*([^（(\n]{2,20})\s*([（(]1[）)])/g, '$1\n$2 ')
+    }
+  }
   return raw
     .split(/\r?\n\s*\r?\n/)
-    .map(para => para.split(/\r?\n/).map(line => convertInlineLatex(line)).join('\\\\\n'))
+    .map(para => {
+      const lines = para.split(/\r?\n/)
+      if (lines.length >= 2 && lines[0].includes('|') && /^\s*\|?[\s:-]+\|/.test(lines[1])) {
+        return markdownTableToLatex(lines)
+      }
+      return lines.map(line => convertInlineLatex(line)).join('\\\\\n')
+    })
     .join('\n\\par\\smallskip\n')
 }
 
-function ustcPreamble(fields: PaperHeaderMeta, showSolutions: boolean, answerOnly: boolean): string {
-  return `% Generated by USTC QBank Studio (compatible with XeLaTeX)
-\\documentclass[a4paper,11pt]{ctexart}
-\\newif\\ifShowInlineSolution\\ShowInlineSolution${showSolutions ? 'true' : 'false'}
-\\newif\\ifAnswerSheetOnly\\AnswerSheetOnly${answerOnly ? 'true' : 'false'}
-\\newif\\ifShowBindingLine\\ShowBindingLine${fields.showBindingLine && !answerOnly ? 'true' : 'false'}
+function buildPreamble(
+  isGaokao: boolean,
+  source: string,
+  fields: PaperHeaderMeta,
+  output: { showSolutions: boolean; answerOnly: boolean },
+): string {
+  if (isGaokao) {
+    return source
+      .replace('__DSH_SHOW_ANSWER__', output.showSolutions ? 'true' : 'false')
+      .replace('__DSH_SOLUTION_MODE__', output.showSolutions ? 'show-stay' : 'hide')
+      .replace('__DSH_TITLE__', latexText(fields.courseTitle))
+      .replace('__DSH_SUBJECT__', latexText(fields.subject))
+  }
+  const marker = source.indexOf('% Dynamic question and answer content')
+  const base = marker >= 0 ? source.slice(0, marker) : source
+  return base
+    .replace('__DSH_EXAM_SCHOOL_TERM__', latexText(fields.schoolTerm))
+    .replace('__DSH_EXAM_COURSE_TITLE__', latexText(fields.courseTitle))
+    .replace('__DSH_EXAM_DATE__', latexText(fields.examDate))
+    .replace('__DSH_EXAM_FORM__', latexText(fields.examForm))
+    .replace('__DSH_EXAM_FOOTER_TERM__', latexText(fields.footerTerm))
+    .replace('\\ShowBindingLinetrue', `\\ShowBindingLine${fields.showBindingLine && !output.answerOnly ? 'true' : 'false'}`)
+    .replace('\\ShowInlineSolutiontrue', `\\ShowInlineSolution${output.showSolutions ? 'true' : 'false'}`)
+    .replace('\\AnswerSheetOnlyfalse', `\\AnswerSheetOnly${output.answerOnly ? 'true' : 'false'}`)
+}
 
-\\newcommand{\\ExamSchoolTerm}{${latexText(fields.schoolTerm)}}
-\\newcommand{\\ExamCourseTitle}{${latexText(fields.courseTitle)}}
-\\newcommand{\\ExamDate}{${latexText(fields.examDate)}}
-\\newcommand{\\ExamForm}{${latexText(fields.examForm)}}
-\\newcommand{\\ExamFooterTerm}{${latexText(fields.footerTerm)}}
+function scoreTableTex(items: PaperItem[], answerOnly: boolean): string {
+  const groups = groupItems(items)
+  if (!groups.length || answerOnly) return ''
+  const columns = `|c|${'c|'.repeat(groups.length + 1)}`
+  const top = ['\\textbf{题号}', ...groups.map((_, index) => chineseNumber(index + 1)), '\\textbf{总分}']
+  const scores = groups.map(group => group.score)
+  const total = scores.reduce((sum, score) => sum + score, 0)
+  return `\\begin{UstcScoreTable}{${columns}}
+  ${top.join(' & ')} \\\\ \\hline
+  \\textbf{满分} & ${scores.join(' & ')} & ${total} \\\\ \\hline
+  \\textbf{得分} & ${groups.map(() => '\\hspace{11mm}').join(' & ')} & \\hspace{13mm} \\\\
+\\end{UstcScoreTable}`
+}
 
-\\usepackage{geometry}
-\\geometry{a4paper,top=23mm,bottom=22mm,left=30mm,right=20mm,footskip=11mm}
-\\usepackage{amsmath,amssymb,amsthm,bm,enumitem,graphicx,xcolor,array,booktabs,environ,fancyhdr,lastpage,tikz,eso-pic,needspace}
-\\allowdisplaybreaks[3]
-\\setlength{\\emergencystretch}{3.5em}
-\\sloppy
-\\definecolor{UstcCommentRed}{HTML}{C01C28}
-\\definecolor{UstcFooterGray}{HTML}{666666}
-\\everymath{\\displaystyle}
-\\newcommand{\\dd}{\\,\\mathrm{d}}
-\\newcommand{\\ee}{\\mathrm{e}}
-\\newcommand{\\ii}{\\mathrm{i}}
+function buildDocumentSection(
+  isGaokao: boolean,
+  paper: SavedPaper,
+  output: { showSolutions: boolean; answerOnly: boolean },
+  fields: PaperHeaderMeta,
+  isCombined: boolean,
+): string {
+  const lines: string[] = []
+  const totalScore = paper.items.reduce((sum, item) => sum + Number(item.score || 0), 0)
+  const writeSpaceTex = { compact: '3cm', standard: '5.5cm', spacious: '7cm' }[fields.writeSpace] ?? '5.5cm'
 
-\\pagestyle{fancy}
-\\fancyhf{}
-\\renewcommand{\\headrulewidth}{0pt}
-\\renewcommand{\\footrulewidth}{0pt}
-\\fancyfoot[C]{\\small\\color{UstcFooterGray}\\ExamFooterTerm\\quad 第~\\thepage~页（共~\\pageref{LastPage}~页）}
+  if (isGaokao) {
+    if (!output.answerOnly) {
+      lines.push('\\secret')
+      lines.push('\\maketitle')
+      lines.push('\\begin{notice}')
+      lines.push('  \\item 答卷前，考生务必将自己的姓名、学号或准考证号填写清楚。')
+      lines.push('  \\item 客观题请在括号内填涂正确选项；非选择题应写出必要的文字说明、证明过程或演算步骤。')
+      lines.push(`  \\item 本试卷共 ${paper.items.length} 题，满分 ${totalScore} 分。`)
+      lines.push('\\end{notice}')
+      lines.push('\\vspace{0.8em}')
+    } else {
+      lines.push(`\\begin{center}{\\Large\\bfseries ${latexText(fields.courseTitle)}——参考答案与解析}\\end{center}`)
+      lines.push('\\vspace{0.6em}')
+    }
+  } else {
+    if (isCombined && !output.answerOnly) {
+      lines.push('\\ShowBindingLine' + (fields.showBindingLine ? 'true' : 'false'))
+      lines.push('\\AnswerSheetOnlyfalse')
+      lines.push('\\ShowInlineSolutionfalse')
+    }
+    lines.push('\\UstcHeader')
+    lines.push(scoreTableTex(paper.items, output.answerOnly))
+  }
 
-\\newcommand{\\DrawUstcBindingLine}{%
-  \\ifShowBindingLine\\ifodd\\value{page}%
-    \\begin{tikzpicture}[remember picture, overlay]
-      \\draw[dashed, line width=0.55pt, dash pattern=on 4pt off 4pt]
-        ([xshift=19mm, yshift=-14mm]current page.north west) -- ([xshift=19mm, yshift=14mm]current page.south west);
-      \\foreach \\y in {-46mm, -118mm, -186mm, -254mm} {
-        \\filldraw[fill=white, draw=black!75, line width=0.45pt] ([xshift=19mm, yshift=\\y]current page.north west) circle (2.8mm);
+  let sequence = 0
+  const groups = groupItems(paper.items)
+  for (const [sectionIndex, group] of groups.entries()) {
+    const scoreDetail = formatSectionScore(group)
+    if (isGaokao) {
+      lines.push(`\\section{${latexText(group.title)}：${scoreDetail}}`)
+      lines.push(`\\begin{enumerate}[label=\\arabic*., start=${sequence + 1}, itemsep=4mm]`)
+    } else {
+      const sectionNumber = chineseNumber(sectionIndex + 1)
+      lines.push(`\\UstcSection{${sectionNumber}}{${scoreDetail}}{${latexText(group.title)}}`)
+      lines.push('\\begin{enumerate}[label=(\\arabic*), leftmargin=2.2em, itemsep=3.5mm]')
+    }
+
+    for (const item of group.items) {
+      const question = item.question
+      sequence++
+      const scoreTag =
+        isGaokao && (question.type === 'solve' || question.type === 'proof') ? `(${item.score}分)\\ ` : ''
+      lines.push(`\\item ${output.answerOnly ? '' : scoreTag}`)
+
+      if (!output.answerOnly) {
+        const stemTex = renderMarkdownToLatex(question.stem.md, true)
+        const choiceSuffix =
+          isGaokao && (question.type === 'single' || question.type === 'multi')
+            ? output.showSolutions
+              ? ` \\paren[${extractChoiceKey(question.answer.md)}]`
+              : ' \\paren'
+            : ''
+        lines.push(`${stemTex}${choiceSuffix}`)
+
+        if (question.options?.length) {
+          if (isGaokao) {
+            lines.push('\\begin{choices}')
+            for (const option of question.options) {
+              lines.push(`  \\item ${renderMarkdownToLatex(option.md, false)}`)
+            }
+            lines.push('\\end{choices}')
+          } else {
+            const opts = [...question.options]
+            while (opts.length < 4) opts.push({ key: '', md: '' })
+            lines.push(`\\UstcOptions{${opts.slice(0, 4).map(o => renderMarkdownToLatex(o.md, false)).join('}{')}}`)
+          }
+        }
       }
-      \\node[rotate=90, anchor=center, font=\\small] at ([xshift=11.5mm, yshift=-152mm]current page.north west)
-        {学生所在院系：\\underline{\\hspace{24mm}}\\hspace{10mm}姓名：\\underline{\\hspace{18mm}}\\hspace{10mm}学号：\\underline{\\hspace{20mm}}};
-      \\node[rotate=90, anchor=center, font=\\small] at ([xshift=22.5mm, yshift=-150mm]current page.north west)
-        {装订线\\hspace{8mm}答题时不要超过此线};
-    \\end{tikzpicture}%
-  \\fi\\fi
-}
-\\AddToShipoutPictureBG{\\DrawUstcBindingLine}
 
-\\newcommand{\\UstcHeader}{%
-  \\begin{center}
-    {\\Large\\bfseries\\heiti \\ExamSchoolTerm\\par}\\vspace{2.2mm}
-    {\\Large\\bfseries\\heiti \\ExamCourseTitle\\ifAnswerSheetOnly\\ ——参考答案与解析\\fi\\par}\\vspace{3.2mm}
-    {\\normalsize 考试时间\\ \\underline{\\makebox[32mm][c]{\\ExamDate}}\\hspace{12mm}考试形式\\ \\underline{\\makebox[32mm][c]{\\ExamForm}}}
-  \\end{center}\\vspace{2.5mm}
-}
-\\newcommand{\\UstcSection}[3]{\\vspace{3.5mm}\\noindent{\\bfseries\\heiti #1.（#2）#3}\\par\\vspace{1.5mm}}
-\\newcommand{\\UstcComment}[1]{\\par\\smallskip\\noindent{\\color{UstcCommentRed}\\textbf{点评：}#1}\\par}
-`
-}
+      if (output.showSolutions) {
+        const label = question.type === 'proof' ? '证明' : '解'
+        const solText = resolveSolutionText(question)
+        const showAns = shouldShowAnswerLine(question)
 
-function gaokaoPreamble(fields: PaperHeaderMeta, showSolutions: boolean): string {
-  return `% Generated by USTC QBank Studio (Gaokao exam-zh template)
-\\documentclass{exam-zh}
-\\usepackage{amsmath,amsthm,graphicx,enumitem,xcolor,array,booktabs,needspace}
-\\examsetup{
-  page/size=a4paper,
-  paren/show-paren=true,
-  paren/show-answer=${showSolutions ? 'true' : 'false'},
-  fillin/show-answer=false,
-  solution/show-solution=${showSolutions ? 'show-stay' : 'hide'},
-  solution/label-indentation=false
-}
-\\allowdisplaybreaks[3]
-\\setlength{\\emergencystretch}{3.5em}
-\\sloppy
-\\everymath{\\displaystyle}
-\\definecolor{ExamCommentRed}{HTML}{C01C28}
-\\title{${latexText(fields.courseTitle)}}
-\\subject{${latexText(fields.subject)}}
-`
+        if (isGaokao) {
+          lines.push('\\begin{solution}')
+          if (showAns) {
+            lines.push(`\\noindent\\textbf{【答案】}\\ ${renderMarkdownToLatex(question.answer.md, false)}\\par\\smallskip`)
+          }
+          if (solText) {
+            lines.push(`\\noindent\\textbf{【${label}】}\\ ${renderMarkdownToLatex(solText, false)}`)
+          }
+          const comment = buildCommentText(item, question)
+          if (comment) {
+            lines.push(`\\par\\smallskip\\noindent{\\color{ExamCommentRed}\\textbf{点评：}${renderMarkdownToLatex(comment, false)}}`)
+          }
+          lines.push('\\end{solution}')
+        } else {
+          if (showAns) {
+            lines.push(`\\par\\vspace{1mm}\\noindent{\\bfseries\\heiti 答案：}\\ ${renderMarkdownToLatex(question.answer.md, false)}`)
+          }
+          if (solText) {
+            lines.push(`\\begin{UstcSolution}[${label}]{${writeSpaceTex}}`)
+            lines.push(renderMarkdownToLatex(solText, false))
+            lines.push('\\end{UstcSolution}')
+          }
+          const comment = buildCommentText(item, question)
+          if (comment) {
+            lines.push(`\\UstcComment{${renderMarkdownToLatex(comment, false)}}`)
+          }
+        }
+      } else if (question.type === 'solve' || question.type === 'proof') {
+        lines.push(`\\par\\vspace{${writeSpaceTex}}`)
+      }
+    }
+    lines.push('\\end{enumerate}')
+  }
+  return lines.join('\n')
 }
 
 export function buildExamLatex(
@@ -534,95 +611,16 @@ export function buildExamLatex(
   fields: PaperHeaderMeta,
 ): string {
   const isGaokao = templateId === 'gaokao'
-  const writeSpaceTex = { compact: '3cm', standard: '5.5cm', spacious: '7cm' }[fields.writeSpace] ?? '5.5cm'
-  const totalScore = paper.items.reduce((s, it) => s + Number(it.score || 0), 0)
-
-  const renderSectionBlock = (showSolutions: boolean, answerOnly: boolean) => {
-    const lines: string[] = []
-    const groups = groupItems(paper.items)
-
-    if (isGaokao) {
-      if (!answerOnly) {
-        lines.push('\\secret\n\\maketitle\n\\begin{notice}')
-        lines.push('  \\item 答卷前，考生务必将自己的姓名、学号或准考证号填写清楚。')
-        lines.push('  \\item 客观题请在括号内填涂正确选项；非选择题应写出必要的文字说明、证明过程或演算步骤。')
-        lines.push(`  \\item 本试卷共 ${paper.items.length} 题，满分 ${totalScore} 分。`)
-        lines.push('\\end{notice}\\vspace{0.8em}')
-      } else {
-        lines.push(`\\begin{center}{\\Large\\bfseries ${latexText(fields.courseTitle)}——参考答案与解析}\\end{center}\\vspace{0.6em}`)
-      }
-    } else {
-      lines.push('\\UstcHeader')
-      if (!answerOnly && groups.length) {
-        const cols = `|c|${'c|'.repeat(groups.length + 1)}`
-        const top = ['\\textbf{题号}', ...groups.map((_, i) => chineseNumber(i + 1)), '\\textbf{总分}']
-        const scores = groups.map(g => g.score)
-        lines.push(
-          `\\begin{center}\\renewcommand{\\arraystretch}{1.5}\\begin{tabular}{${cols}}\\hline\n${top.join(' & ')} \\\\ \\hline\n\\textbf{满分} & ${scores.join(' & ')} & ${totalScore} \\\\ \\hline\n\\textbf{得分} & ${groups.map(() => '\\hspace{11mm}').join(' & ')} & \\hspace{13mm} \\\\ \\hline\n\\end{tabular}\\end{center}\\vspace{2mm}`,
-        )
-      }
-    }
-
-    let seq = 0
-    for (const [secIdx, group] of groups.entries()) {
-      const scoreDetail = formatSectionScore(group)
-      if (isGaokao) {
-        lines.push(`\\section{${latexText(group.title)}：${scoreDetail}}`)
-        lines.push(`\\begin{enumerate}[label=\\arabic*., start=${seq + 1}, itemsep=4mm]`)
-      } else {
-        lines.push(`\\UstcSection{${chineseNumber(secIdx + 1)}}{${scoreDetail}}{${latexText(group.title)}}`)
-        lines.push('\\begin{enumerate}[label=(\\arabic*), leftmargin=2.2em, itemsep=3.5mm]')
-      }
-
-      for (const item of group.items) {
-        seq++
-        const q = item.question
-        const scoreTag = !answerOnly && (q.type === 'solve' || q.type === 'proof') ? `(${item.score}分)\\ ` : ''
-        lines.push(`\\item ${scoreTag}`)
-        if (!answerOnly) {
-          lines.push(renderMarkdownToLatex(q.stem.md))
-          if (q.options?.length) {
-            lines.push('\\begin{enumerate}[label=\\Alph*., leftmargin=2em, itemsep=1.5mm]')
-            for (const opt of q.options) {
-              lines.push(`  \\item ${renderMarkdownToLatex(opt.md)}`)
-            }
-            lines.push('\\end{enumerate}')
-          }
-        }
-        if (showSolutions) {
-          const label = q.type === 'proof' ? '证明' : '解'
-          const solText = resolveSolutionText(q)
-          if (shouldShowAnswerLine(q)) {
-            lines.push(`\\par\\vspace{1mm}\\noindent{\\bfseries\\heiti 答案：}\\ ${renderMarkdownToLatex(q.answer.md)}`)
-          }
-          if (solText) {
-            lines.push(`\\par\\vspace{1mm}\\noindent{\\bfseries\\heiti ${label}：}\\ ${renderMarkdownToLatex(solText)}`)
-          }
-          const comment = buildCommentText(item, q)
-          if (comment) {
-            lines.push(
-              isGaokao
-                ? `\\par\\smallskip\\noindent{\\color{ExamCommentRed}\\textbf{点评：}${renderMarkdownToLatex(comment)}}`
-                : `\\UstcComment{${renderMarkdownToLatex(comment)}}`,
-            )
-          }
-        } else if (q.type === 'solve' || q.type === 'proof') {
-          lines.push(`\\par\\vspace{${writeSpaceTex}}`)
-        }
-      }
-      lines.push('\\end{enumerate}')
-    }
-    return lines.join('\n')
-  }
+  const source = isGaokao ? gaokaoTemplateTex : ustcTemplateTex
 
   if (mode === 'split') {
-    const preamble = isGaokao ? gaokaoPreamble(fields, true) : ustcPreamble(fields, true, false)
-    const qBody = renderSectionBlock(false, false)
-    const aBody = renderSectionBlock(true, true)
+    const preamble = buildPreamble(isGaokao, source, fields, { showSolutions: true, answerOnly: false })
+    const qBody = buildDocumentSection(isGaokao, paper, { showSolutions: false, answerOnly: false }, fields, true)
+    const aBody = buildDocumentSection(isGaokao, paper, { showSolutions: true, answerOnly: true }, fields, true)
     return `${preamble}\n\\begin{document}\n${qBody}\n\\clearpage\n${isGaokao ? '' : '\\ShowBindingLinefalse\\AnswerSheetOnlytrue\\ShowInlineSolutiontrue\n'}${aBody}\n\\end{document}\n`
   }
 
-  const preamble = isGaokao ? gaokaoPreamble(fields, true) : ustcPreamble(fields, true, false)
-  const body = renderSectionBlock(true, false)
-  return `${preamble}\n\\begin{document}\n${body}\n\\end{document}\n`
+  const preamble = buildPreamble(isGaokao, source, fields, { showSolutions: true, answerOnly: false })
+  const docBody = buildDocumentSection(isGaokao, paper, { showSolutions: true, answerOnly: false }, fields, false)
+  return `${preamble}\n\\begin{document}\n${docBody}\n\\end{document}\n`
 }
