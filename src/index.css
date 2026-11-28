@@ -22,10 +22,43 @@
   --mastered-soft: rgba(27, 122, 82, 0.09);
   --shadow-paper: 0 1px 2px rgba(24, 24, 27, 0.04), 0 8px 28px -8px rgba(24, 24, 27, 0.06);
   --shadow-sheet: 0 2px 6px rgba(24, 24, 27, 0.04), 0 18px 42px -12px rgba(24, 24, 27, 0.10);
-  --glass-bg: rgba(252, 251, 248, 0.74);
-  --glass-border: rgba(255, 255, 255, 0.72);
-  --glass-outline: rgba(28, 30, 33, 0.08);
+  --glass-bg: rgba(252, 251, 248, 0.72);
+  --glass-tint-top: rgba(255, 255, 255, 0.84);
+  --glass-tint-mid: rgba(250, 249, 245, 0.62);
+  --glass-tint-bot: rgba(244, 241, 234, 0.72);
+  --glass-sheet-top: rgba(255, 255, 255, 0.90);
+  --glass-sheet-mid: rgba(252, 251, 248, 0.80);
+  --glass-sheet-bot: rgba(246, 244, 238, 0.86);
+  --glass-header-top: rgba(250, 249, 246, 0.86);
+  --glass-header-mid: rgba(250, 249, 246, 0.62);
+  --glass-header-bot: rgba(250, 249, 246, 0.0);
+  --glass-border: rgba(255, 255, 255, 0.86);
+  --glass-outline: rgba(28, 30, 33, 0.085);
   --glass-pill: rgba(28, 30, 33, 0.075);
+  --glass-fresnel-hi: rgba(255, 255, 255, 0.96);
+  --glass-fresnel-cool: rgba(162, 198, 255, 0.44);
+  --glass-fresnel-mid: rgba(28, 30, 33, 0.07);
+  --glass-fresnel-warm: rgba(235, 196, 138, 0.36);
+  --glass-fresnel-lo: rgba(255, 255, 255, 0.62);
+  --glass-caustic-top: rgba(255, 255, 255, 0.90);
+  --glass-caustic-bot: rgba(28, 30, 33, 0.06);
+  --glass-hairline-edge: rgba(28, 30, 33, 0.09);
+  --glass-hairline-glint: rgba(255, 255, 255, 0.95);
+  --glass-shadow-dock:
+    0 18px 42px -12px rgba(20, 22, 28, 0.16),
+    0 4px 14px -4px rgba(20, 22, 28, 0.08),
+    0 0 0 0.5px rgba(28, 30, 33, 0.08);
+  --glass-shadow-pill:
+    0 8px 22px -8px rgba(20, 22, 28, 0.16),
+    0 1px 4px -1px rgba(20, 22, 28, 0.08),
+    0 0 0 0.5px rgba(28, 30, 33, 0.09);
+  --glass-shadow-sheet:
+    0 28px 68px -16px rgba(18, 20, 26, 0.22),
+    0 6px 18px -6px rgba(18, 20, 26, 0.10),
+    0 0 0 0.5px rgba(28, 30, 33, 0.08);
+  --glass-scrim-center: rgba(24, 26, 32, 0.18);
+  --glass-scrim-edge: rgba(16, 18, 24, 0.44);
+  --glass-grain-opacity: 0.032;
   --logo-bg: #FAF9F5;
   --logo-border: #DCD8CE;
   --logo-arc: #E6E3DA;
@@ -59,9 +92,42 @@
   --shadow-paper: 0 1px 2px rgba(0, 0, 0, 0.28), 0 10px 30px -10px rgba(0, 0, 0, 0.45);
   --shadow-sheet: 0 4px 12px rgba(0, 0, 0, 0.35), 0 22px 50px -14px rgba(0, 0, 0, 0.55);
   --glass-bg: rgba(29, 31, 36, 0.76);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-outline: rgba(0, 0, 0, 0.45);
+  --glass-tint-top: rgba(44, 48, 58, 0.76);
+  --glass-tint-mid: rgba(24, 26, 32, 0.68);
+  --glass-tint-bot: rgba(18, 20, 25, 0.78);
+  --glass-sheet-top: rgba(36, 39, 47, 0.84);
+  --glass-sheet-mid: rgba(26, 28, 34, 0.76);
+  --glass-sheet-bot: rgba(20, 22, 27, 0.84);
+  --glass-header-top: rgba(22, 23, 26, 0.86);
+  --glass-header-mid: rgba(22, 23, 26, 0.60);
+  --glass-header-bot: rgba(22, 23, 26, 0.0);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-outline: rgba(0, 0, 0, 0.48);
   --glass-pill: rgba(255, 255, 255, 0.11);
+  --glass-fresnel-hi: rgba(255, 255, 255, 0.34);
+  --glass-fresnel-cool: rgba(120, 172, 255, 0.28);
+  --glass-fresnel-mid: rgba(255, 255, 255, 0.04);
+  --glass-fresnel-warm: rgba(242, 184, 112, 0.18);
+  --glass-fresnel-lo: rgba(255, 255, 255, 0.15);
+  --glass-caustic-top: rgba(255, 255, 255, 0.18);
+  --glass-caustic-bot: rgba(0, 0, 0, 0.42);
+  --glass-hairline-edge: rgba(255, 255, 255, 0.09);
+  --glass-hairline-glint: rgba(140, 184, 255, 0.24);
+  --glass-shadow-dock:
+    0 20px 46px -10px rgba(0, 0, 0, 0.56),
+    0 4px 14px -4px rgba(0, 0, 0, 0.36),
+    0 0 0 0.5px rgba(0, 0, 0, 0.65);
+  --glass-shadow-pill:
+    0 10px 26px -8px rgba(0, 0, 0, 0.52),
+    0 2px 6px -1px rgba(0, 0, 0, 0.32),
+    0 0 0 0.5px rgba(0, 0, 0, 0.58);
+  --glass-shadow-sheet:
+    0 32px 76px -14px rgba(0, 0, 0, 0.68),
+    0 8px 22px -6px rgba(0, 0, 0, 0.45),
+    0 0 0 0.5px rgba(0, 0, 0, 0.68);
+  --glass-scrim-center: rgba(8, 9, 12, 0.34);
+  --glass-scrim-edge: rgba(4, 5, 8, 0.66);
+  --glass-grain-opacity: 0.045;
   --logo-bg: #1E2127;
   --logo-border: #323742;
   --logo-arc: #272B34;
@@ -116,22 +182,466 @@
   box-shadow: var(--shadow-sheet);
 }
 
-.glass-header {
-  background: var(--glass-bg);
-  backdrop-filter: blur(22px) saturate(175%);
-  -webkit-backdrop-filter: blur(22px) saturate(175%);
-  border-bottom: 1px solid var(--border-hairline);
-}
+@layer components {
+  /* ==========================================================================
+   * 5-Layer Optical Frosted Glass System
+   *  1. Snell's Law Convex-Squircle Refraction + Cauchy RGB Dispersion (Blink)
+   *  2. Multi-tier Progressive Blur Masking (mask-image feathering)
+   *  3. Directional 135° Subsurface Gradient Tint
+   *  4. Fresnel Grazing-Angle Specular Border (mask-composite: exclude)
+   *  5. Micro-Grain Dielectric Texture (feTurbulence anti-banding)
+   * ========================================================================== */
 
-.glass-dock {
-  background: var(--glass-bg);
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
-  border: 1px solid var(--glass-outline);
-  box-shadow:
-    inset 0 1px 0 0 var(--glass-border),
-    0 12px 34px -8px rgba(15, 17, 22, 0.22),
-    0 2px 8px -2px rgba(15, 17, 22, 0.10);
+  /* 1. Sticky Top Bar — Progressive Masked Blur + Optical Bottom Lip */
+  .glass-header {
+    position: sticky;
+    background: transparent;
+    isolation: isolate;
+  }
+
+  .glass-header-backdrop {
+    position: absolute;
+    inset: 0 0 -14px 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glass-header-blur {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  /* Tier 1: Core optical density + Snell bottom-lip refraction on Chromium */
+  .glass-header-blur-1 {
+    -webkit-backdrop-filter: blur(20px) saturate(185%);
+    backdrop-filter: blur(20px) saturate(185%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 66%, rgba(0, 0, 0, 0.35) 84%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 66%, rgba(0, 0, 0, 0.35) 84%, transparent 100%);
+  }
+
+  /* Tier 2: Mid-field progressive feathering */
+  .glass-header-blur-2 {
+    -webkit-backdrop-filter: blur(9px) saturate(145%);
+    backdrop-filter: blur(9px) saturate(145%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 42%, #000 76%, rgba(0, 0, 0, 0.45) 90%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 42%, #000 76%, rgba(0, 0, 0, 0.45) 90%, transparent 100%);
+  }
+
+  /* Tier 3: Whisper-soft apron melting into archival paper canvas */
+  .glass-header-blur-3 {
+    -webkit-backdrop-filter: blur(3px) saturate(118%);
+    backdrop-filter: blur(3px) saturate(118%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 68%, rgba(0, 0, 0, 0.85) 88%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 68%, rgba(0, 0, 0, 0.85) 88%, transparent 100%);
+  }
+
+  /* Directional translucent wash + faint top-to-bottom specular sheen */
+  .glass-header-tint {
+    position: absolute;
+    inset: 0 0 14px 0;
+    background: linear-gradient(
+      180deg,
+      var(--glass-header-top) 0%,
+      var(--glass-header-mid) 82%,
+      var(--glass-tint-mid) 100%
+    );
+    box-shadow: inset 0 1px 0 0 var(--glass-caustic-top);
+    pointer-events: none;
+  }
+
+  /* Radial Fresnel specular hairline along the exact bottom lip of the header */
+  .glass-header-hairline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 14px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--glass-hairline-edge) 12%,
+      var(--glass-hairline-glint) 38%,
+      var(--glass-hairline-edge) 66%,
+      var(--glass-hairline-glint) 88%,
+      transparent 100%
+    );
+    box-shadow: 0 1px 0 0 var(--glass-hairline-edge);
+    pointer-events: none;
+  }
+
+  /* 2. Floating Pill Dock (Mobile Bottom Nav + Floating Cart Assembly Bar) */
+  .glass-dock {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(
+      138deg,
+      var(--glass-tint-top) 0%,
+      var(--glass-tint-mid) 48%,
+      var(--glass-tint-bot) 100%
+    );
+    -webkit-backdrop-filter: blur(20px) saturate(195%) contrast(1.03);
+    backdrop-filter: blur(20px) saturate(195%) contrast(1.03);
+    box-shadow:
+      inset 0 1px 0.5px 0 var(--glass-caustic-top),
+      inset 0 -1px 1px 0 var(--glass-caustic-bot),
+      var(--glass-shadow-dock);
+  }
+
+  .glass-dock::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      var(--glass-fresnel-hi) 0%,
+      var(--glass-fresnel-cool) 24%,
+      var(--glass-fresnel-mid) 50%,
+      var(--glass-fresnel-warm) 78%,
+      var(--glass-fresnel-lo) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .glass-dock::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: var(--glass-grain-opacity);
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 19;
+  }
+
+  /* Active Sliding Lens inside Mobile Glass Dock */
+  .glass-active-pill {
+    background: linear-gradient(
+      155deg,
+      var(--glass-caustic-top) 0%,
+      var(--glass-pill) 52%,
+      var(--glass-tint-mid) 100%
+    );
+    box-shadow:
+      inset 0 1px 0.5px 0 var(--glass-fresnel-hi),
+      inset 0 -1px 1px 0 var(--glass-caustic-bot),
+      0 2px 8px -2px rgba(20, 22, 28, 0.14);
+  }
+
+  .glass-active-pill::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      var(--glass-fresnel-hi) 0%,
+      var(--glass-fresnel-cool) 35%,
+      var(--glass-fresnel-mid) 65%,
+      var(--glass-fresnel-lo) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* 3. Small Optical Pills (Discipline Counters, Editorial Toasts) */
+  .glass-pill-optical {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(
+      135deg,
+      var(--glass-tint-top) 0%,
+      var(--glass-tint-mid) 52%,
+      var(--glass-tint-bot) 100%
+    );
+    color: var(--ink-primary);
+    -webkit-backdrop-filter: blur(14px) saturate(185%) contrast(1.02);
+    backdrop-filter: blur(14px) saturate(185%) contrast(1.02);
+    box-shadow:
+      inset 0 1px 0.5px 0 var(--glass-caustic-top),
+      inset 0 -0.5px 1px 0 var(--glass-caustic-bot),
+      var(--glass-shadow-pill);
+  }
+
+  .glass-pill-optical::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      var(--glass-fresnel-hi) 0%,
+      var(--glass-fresnel-cool) 28%,
+      var(--glass-fresnel-mid) 54%,
+      var(--glass-fresnel-warm) 80%,
+      var(--glass-fresnel-lo) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .glass-pill-optical::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: var(--glass-grain-opacity);
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 19;
+  }
+
+  .glass-pill-success {
+    color: var(--mastered);
+    background: linear-gradient(
+      135deg,
+      var(--glass-tint-top) 0%,
+      color-mix(in srgb, var(--mastered-soft) 55%, var(--glass-tint-mid)) 55%,
+      var(--glass-tint-bot) 100%
+    );
+  }
+
+  .glass-pill-error {
+    color: var(--comment-red);
+    background: linear-gradient(
+      135deg,
+      var(--glass-tint-top) 0%,
+      color-mix(in srgb, var(--comment-red-soft) 55%, var(--glass-tint-mid)) 55%,
+      var(--glass-tint-bot) 100%
+    );
+  }
+
+  /* 4. Elevated Architectural Glass Sheet (Command Palette, Modals, Drawers) */
+  .glass-sheet {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(
+      148deg,
+      var(--glass-sheet-top) 0%,
+      var(--glass-sheet-mid) 52%,
+      var(--glass-sheet-bot) 100%
+    );
+    -webkit-backdrop-filter: blur(24px) saturate(180%) contrast(1.02);
+    backdrop-filter: blur(24px) saturate(180%) contrast(1.02);
+    box-shadow:
+      inset 0 1px 0 0 var(--glass-caustic-top),
+      inset 0 -1px 1px 0 var(--glass-caustic-bot),
+      var(--glass-shadow-sheet);
+  }
+
+  .glass-sheet::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      138deg,
+      var(--glass-fresnel-hi) 0%,
+      var(--glass-fresnel-cool) 20%,
+      var(--glass-fresnel-mid) 48%,
+      var(--glass-fresnel-warm) 82%,
+      var(--glass-fresnel-lo) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .glass-sheet::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: var(--glass-grain-opacity);
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 19;
+  }
+
+  /* Radial Vignette Optical Backdrop Scrim */
+  .glass-scrim {
+    background: radial-gradient(
+      ellipse 80% 70% at 50% 30%,
+      var(--glass-scrim-center) 0%,
+      var(--glass-scrim-edge) 100%
+    );
+    -webkit-backdrop-filter: blur(10px) saturate(130%);
+    backdrop-filter: blur(10px) saturate(130%);
+  }
+
+  /* 5. Circular Convex Lens Orb (PPT Stage Prev/Next Controls) */
+  .glass-orb {
+    position: relative;
+    isolation: isolate;
+    background: radial-gradient(
+      circle at 30% 25%,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(250, 249, 245, 0.68) 55%,
+      rgba(238, 235, 228, 0.78) 100%
+    );
+    color: #1c1e21;
+    -webkit-backdrop-filter: blur(12px) saturate(190%);
+    backdrop-filter: blur(12px) saturate(190%);
+    box-shadow:
+      inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 2px 0 rgba(28, 30, 33, 0.10),
+      0 8px 20px -6px rgba(18, 20, 26, 0.24),
+      0 0 0 0.5px rgba(28, 30, 33, 0.10);
+  }
+
+  .glass-orb::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(
+      from 225deg,
+      rgba(255, 255, 255, 0.96) 0deg,
+      rgba(155, 194, 255, 0.55) 70deg,
+      rgba(28, 30, 33, 0.12) 170deg,
+      rgba(235, 196, 138, 0.42) 260deg,
+      rgba(255, 255, 255, 0.96) 360deg
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  /* 6. Cinema-Stage Dark Optical HUD Pill (PPT Fullscreen Presenter) */
+  .glass-hud-dark {
+    position: relative;
+    isolation: isolate;
+    background: linear-gradient(
+      140deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.06) 54%,
+      rgba(255, 255, 255, 0.10) 100%
+    );
+    color: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    backdrop-filter: blur(18px) saturate(180%);
+    box-shadow:
+      inset 0 1px 0.5px 0 rgba(255, 255, 255, 0.28),
+      inset 0 -1px 1px 0 rgba(0, 0, 0, 0.42),
+      0 10px 28px -8px rgba(0, 0, 0, 0.55);
+    transition: background 180ms ease, transform 180ms ease;
+  }
+
+  .glass-hud-dark:hover:not(:disabled) {
+    background: linear-gradient(
+      140deg,
+      rgba(255, 255, 255, 0.24) 0%,
+      rgba(255, 255, 255, 0.11) 54%,
+      rgba(255, 255, 255, 0.16) 100%
+    );
+  }
+
+  .glass-hud-dark::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.44) 0%,
+      rgba(130, 180, 255, 0.24) 30%,
+      rgba(255, 255, 255, 0.06) 58%,
+      rgba(245, 195, 130, 0.20) 85%,
+      rgba(255, 255, 255, 0.22) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  /* Chromium/Blink Progressive Enhancement:
+   * SVG Snell's Law feDisplacementMap + Cauchy RGB dispersion ALWAYS precedes
+   * native CSS blur()/saturate() in backdrop-filter to avoid Chromium banding.
+   * Keep standard backdrop-filter LAST so LightningCSS preserves it cleanly. */
+  .optical-refraction .glass-header-blur-1 {
+    -webkit-backdrop-filter: url(#optical-glass-header) blur(14px) saturate(185%);
+    backdrop-filter: url(#optical-glass-header) blur(14px) saturate(185%);
+  }
+
+  .optical-refraction .glass-dock {
+    -webkit-backdrop-filter: url(#optical-glass-pill) blur(7px) saturate(210%) contrast(1.04);
+    backdrop-filter: url(#optical-glass-pill) blur(7px) saturate(210%) contrast(1.04);
+  }
+
+  .optical-refraction .glass-pill-optical {
+    -webkit-backdrop-filter: url(#optical-glass-pill) blur(5px) saturate(195%) contrast(1.03);
+    backdrop-filter: url(#optical-glass-pill) blur(5px) saturate(195%) contrast(1.03);
+  }
+
+  .optical-refraction .glass-sheet {
+    -webkit-backdrop-filter: url(#optical-glass-sheet) blur(18px) saturate(185%) contrast(1.02);
+    backdrop-filter: url(#optical-glass-sheet) blur(18px) saturate(185%) contrast(1.02);
+  }
+
+  .optical-refraction .glass-orb {
+    -webkit-backdrop-filter: url(#optical-glass-orb) blur(4px) saturate(200%);
+    backdrop-filter: url(#optical-glass-orb) blur(4px) saturate(200%);
+  }
+
+  .optical-refraction .glass-hud-dark {
+    -webkit-backdrop-filter: url(#optical-glass-pill) blur(10px) saturate(190%);
+    backdrop-filter: url(#optical-glass-pill) blur(10px) saturate(190%);
+  }
 }
 
 /* Subtle editorial scrollbar */

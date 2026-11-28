@@ -247,7 +247,7 @@ export function PptStudioView() {
                 type="button"
                 disabled={currentIdx === 0}
                 onClick={() => goTo(currentIdx - 1)}
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 backdrop-blur-md border border-black/10 text-neutral-800 shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-0 transition-opacity cursor-pointer"
+                className="glass-orb absolute left-2.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-0 transition-opacity cursor-pointer"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
@@ -255,7 +255,7 @@ export function PptStudioView() {
                 type="button"
                 disabled={currentIdx === slides.length - 1}
                 onClick={() => goTo(currentIdx + 1)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-white/85 backdrop-blur-md border border-black/10 text-neutral-800 shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-0 transition-opacity cursor-pointer"
+                className="glass-orb absolute right-2.5 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100 disabled:opacity-0 transition-opacity cursor-pointer"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
@@ -347,13 +347,13 @@ export function PptStudioView() {
             className="fixed inset-0 z-50 bg-[#0F1013] flex flex-col items-center justify-center p-4 sm:p-8"
           >
             <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-              <span className="rounded-full bg-white/10 backdrop-blur-md px-3 py-1 font-mono-num text-xs text-white/85">
+              <span className="glass-hud-dark rounded-full px-3 py-1 font-mono-num text-xs">
                 {currentIdx + 1} / {slides.length}
               </span>
               <button
                 type="button"
                 onClick={() => setFullscreen(false)}
-                className="flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur-md px-3 py-1.5 text-xs text-white hover:bg-white/20 cursor-pointer"
+                className="glass-hud-dark flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs cursor-pointer"
               >
                 <Minimize2 className="h-3.5 w-3.5" /> 退出放映 (ESC)
               </button>
@@ -379,7 +379,7 @@ export function PptStudioView() {
                 type="button"
                 disabled={currentIdx === 0}
                 onClick={() => goTo(currentIdx - 1)}
-                className="rounded-full bg-white/10 px-4 py-2 text-xs text-white disabled:opacity-30 hover:bg-white/20 cursor-pointer"
+                className="glass-hud-dark rounded-full px-4 py-2 text-xs disabled:opacity-30 cursor-pointer"
               >
                 ← 上一页
               </button>
@@ -387,7 +387,7 @@ export function PptStudioView() {
                 type="button"
                 disabled={currentIdx === slides.length - 1}
                 onClick={() => goTo(currentIdx + 1)}
-                className="rounded-full bg-white/10 px-4 py-2 text-xs text-white disabled:opacity-30 hover:bg-white/20 cursor-pointer"
+                className="glass-hud-dark rounded-full px-4 py-2 text-xs disabled:opacity-30 cursor-pointer"
               >
                 下一页 →
               </button>

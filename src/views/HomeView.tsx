@@ -67,7 +67,7 @@ export function HomeView() {
 
   const official = sources.find(s => s.source_id === 'ustc-official')
   const manifestCourses = official?.manifest?.courses ?? []
-  const totalCatalogQuestions = official?.manifest?.stats?.questions ?? 11710
+  const totalCatalogQuestions = official?.manifest?.stats?.questions ?? 26248
   const installedMap = official?.installed_courses ?? {}
 
   const handleOpenCourse = async (code: string) => {
@@ -148,7 +148,7 @@ export function HomeView() {
             />
           </div>
           <figcaption className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11.5px] font-mono-num text-[var(--ink-muted)]">
-            <span>USTC-Question-Bank · v{official?.data_version ?? '0.14.0'}</span>
+            <span>USTC-Question-Bank · v{official?.data_version ?? '0.25.0'}</span>
             <span>
               {manifestCourses.length} 门课程 · {totalCatalogQuestions.toLocaleString()} 题
             </span>
@@ -202,7 +202,7 @@ export function HomeView() {
                     alt={disc.label}
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                   />
-                  <div className="absolute top-3 right-3 rounded-full bg-white/85 dark:bg-[#1a1c21]/85 backdrop-blur-md px-2.5 py-1 text-[11px] font-mono-num text-[#1c1e21] dark:text-[#edece6] border border-white/60 dark:border-white/10">
+                  <div className="glass-pill-optical absolute top-3 right-3 rounded-full px-2.5 py-1 text-[11px] font-mono-num">
                     {matched.length} 门 · {qSum.toLocaleString()} 题
                   </div>
                 </div>

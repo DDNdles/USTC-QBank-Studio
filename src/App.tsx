@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { MotionConfig, AnimatePresence, motion } from 'framer-motion'
 import { StudyProvider, useStudy } from './context/StudyContext'
 import { NavigationShell } from './components/NavigationShell'
+import { OpticalGlassDefs } from './components/OpticalGlassDefs'
 import { FeedbackModal } from './components/FeedbackModal'
 import { CommandPalette } from './components/CommandPalette'
 import { HomeView } from './views/HomeView'
@@ -32,6 +33,7 @@ function StudioShell() {
 
   return (
     <div className="min-h-dvh bg-[var(--bg-canvas)] text-[var(--ink-primary)] transition-colors duration-300">
+      <OpticalGlassDefs />
       <NavigationShell onOpenCommand={() => setCommandOpen(true)} />
 
       <AnimatePresence mode="wait">
@@ -64,12 +66,12 @@ function StudioShell() {
             className="no-print fixed top-16 left-1/2 -translate-x-1/2 z-50 max-w-[92vw]"
           >
             <div
-              className={`rounded-full border px-4 py-2 text-xs font-medium shadow-lg backdrop-blur-xl ${
+              className={`glass-pill-optical rounded-full px-4 py-2 text-xs font-medium ${
                 toast.tone === 'error'
-                  ? 'border-[var(--comment-red)]/40 bg-[var(--bg-paper)]/95 text-[var(--comment-red)]'
+                  ? 'glass-pill-error'
                   : toast.tone === 'success'
-                    ? 'border-[var(--mastered)]/40 bg-[var(--bg-paper)]/95 text-[var(--mastered)]'
-                    : 'border-[var(--border-strong)] bg-[var(--bg-paper)]/95 text-[var(--ink-primary)]'
+                    ? 'glass-pill-success'
+                    : ''
               }`}
             >
               {toast.text}

@@ -71,13 +71,30 @@ export function resolveFigureUrl(
   return urls[0] ?? null
 }
 
-async function fetchWithFallback(urls: string[], signal?: AbortSignal): Promise<ArrayBuffer> {
+async function fetchWithFallback(
+  urls: string[],
+  signal?: AbortSignal,
+  expectedSha256?: string,
+  label?: string,
+): Promise<ArrayBuffer> {
   let lastError: unknown = null
   for (const url of urls) {
     try {
-      const res = await fetch(url, { signal, cache: 'no-cache' })
-      if (res.ok) return await res.arrayBuffer()
-      lastError = new Error(`HTTP ${res.status} (${url})`)
+      const res = await fetch(url, { signal, cache: 'no-store' })
+      if (!res.ok) {
+        lastError = new Error(`HTTP ${res.status} (${url})`)
+        continue
+      }
+      const buf = await res.arrayBuffer()
+      if (expectedSha256) {
+        const actual = await sha256Hex(buf)
+        if (actual !== expectedSha256) {
+          // Stale CDN mirror (e.g. jsDelivr caching an older @main snapshot) — fall back to next candidate
+          lastError = new Error(`${label ?? '文件'} SHA-256 校验未通过`)
+          continue
+        }
+      }
+      return buf
     } catch (err) {
       if (signal?.aborted) throw err
       lastError = err
@@ -112,6 +129,38 @@ function compareSemver(a?: string | null, b?: string | null): number {
   return 0
 }
 
+function isNewerManifest(candidate: BankManifest, current: BankManifest): boolean {
+  const cmp = compareSemver(candidate.data_version, current.data_version)
+  if (cmp !== 0) return cmp > 0
+  const candCourses = candidate.courses?.length ?? 0
+  const curCourses = current.courses?.length ?? 0
+  if (candCourses !== curCourses) return candCourses > curCourses
+  const candQ = candidate.stats?.questions ?? 0
+  const curQ = current.stats?.questions ?? 0
+  if (candQ !== curQ) return candQ > curQ
+  return (candidate.updated_at ?? '') > (current.updated_at ?? '')
+}
+
+async function fetchManifestCandidate(url: string, signal?: AbortSignal, timeoutMs = 6000): Promise<BankManifest> {
+  const ctrl = new AbortController()
+  const onParentAbort = () => ctrl.abort()
+  signal?.addEventListener('abort', onParentAbort, { once: true })
+  const timer = window.setTimeout(() => ctrl.abort(), timeoutMs)
+  try {
+    const res = await fetch(url, { signal: ctrl.signal, cache: 'no-store' })
+    if (!res.ok) throw new Error(`HTTP ${res.status} (${url})`)
+    const text = new TextDecoder('utf-8').decode(await res.arrayBuffer())
+    const parsed = JSON.parse(text) as BankManifest
+    if (!parsed || !Array.isArray(parsed.courses)) {
+      throw new Error('manifest.json 格式不符合题库协议 v1.0')
+    }
+    return parsed
+  } finally {
+    window.clearTimeout(timer)
+    signal?.removeEventListener('abort', onParentAbort)
+  }
+}
+
 export async function refreshSourceManifest(
   source: SourceConfig,
   signal?: AbortSignal,
@@ -121,30 +170,21 @@ export async function refreshSourceManifest(
   let bestManifest: BankManifest | null = null
   let lastError: unknown = null
 
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, { signal, cache: 'no-cache' })
-      if (!res.ok) {
-        lastError = new Error(`HTTP ${res.status} (${url})`)
-        continue
+  // Probe all candidate URLs (CDN mirror + raw GitHub) concurrently with bounded timeout
+  // so a stale jsDelivr @main cache never masks a newer upstream release on raw.githubusercontent.com.
+  const results = await Promise.allSettled(urls.map(url => fetchManifestCandidate(url, signal)))
+  for (const r of results) {
+    if (r.status === 'fulfilled') {
+      if (!bestManifest || isNewerManifest(r.value, bestManifest)) {
+        bestManifest = r.value
       }
-      const text = new TextDecoder('utf-8').decode(await res.arrayBuffer())
-      const parsed = JSON.parse(text) as BankManifest
-      if (!parsed || !Array.isArray(parsed.courses)) {
-        lastError = new Error('manifest.json 格式不符合题库协议 v1.0')
-        continue
-      }
-      if (!bestManifest || compareSemver(parsed.data_version, bestManifest.data_version) > 0) {
-        bestManifest = parsed
-      }
-      // If a CDN mirror serves a stale version older than our cached manifest, keep trying later candidates (e.g. raw GitHub)
-      if (!source.data_version || compareSemver(parsed.data_version, source.data_version) >= 0) {
-        break
-      }
-    } catch (err) {
-      if (signal?.aborted) throw err
-      lastError = err
+    } else {
+      lastError = r.reason
     }
+  }
+
+  if (signal?.aborted) {
+    throw new DOMException('Aborted', 'AbortError')
   }
 
   if (!bestManifest) {
@@ -152,7 +192,7 @@ export async function refreshSourceManifest(
   }
 
   // Never downgrade a newer bundled/cached manifest with a stale CDN response
-  if (source.manifest && compareSemver(bestManifest.data_version, source.data_version) < 0) {
+  if (source.manifest && !isNewerManifest(bestManifest, source.manifest) && compareSemver(bestManifest.data_version, source.data_version) < 0) {
     return source
   }
 
@@ -206,9 +246,24 @@ export async function syncCoursesFromSource(
     })
 
     const [metaBuf, taxBuf, qBuf] = await Promise.all([
-      fetchWithFallback(buildCandidateUrls(activeSource, course.paths.meta), signal),
-      fetchWithFallback(buildCandidateUrls(activeSource, course.paths.taxonomy), signal),
-      fetchWithFallback(buildCandidateUrls(activeSource, course.paths.questions), signal),
+      fetchWithFallback(
+        buildCandidateUrls(activeSource, course.paths.meta),
+        signal,
+        course.sha256?.meta,
+        `${course.code} meta.json`,
+      ),
+      fetchWithFallback(
+        buildCandidateUrls(activeSource, course.paths.taxonomy),
+        signal,
+        course.sha256?.taxonomy,
+        `${course.code} taxonomy.json`,
+      ),
+      fetchWithFallback(
+        buildCandidateUrls(activeSource, course.paths.questions),
+        signal,
+        course.sha256?.questions,
+        `${course.code} questions.jsonl`,
+      ),
     ])
 
     onProgress?.({
@@ -218,16 +273,6 @@ export async function syncCoursesFromSource(
       total: targets.length,
       phase: 'verifying',
     })
-
-    if (course.sha256?.meta && (await sha256Hex(metaBuf)) !== course.sha256.meta) {
-      throw new Error(`${course.code} meta.json SHA-256 校验未通过`)
-    }
-    if (course.sha256?.taxonomy && (await sha256Hex(taxBuf)) !== course.sha256.taxonomy) {
-      throw new Error(`${course.code} taxonomy.json SHA-256 校验未通过`)
-    }
-    if (course.sha256?.questions && (await sha256Hex(qBuf)) !== course.sha256.questions) {
-      throw new Error(`${course.code} questions.jsonl SHA-256 校验未通过`)
-    }
 
     onProgress?.({
       courseCode: course.code,

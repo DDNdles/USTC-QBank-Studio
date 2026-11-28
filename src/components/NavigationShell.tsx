@@ -53,9 +53,16 @@ export function NavigationShell({
 
   return (
     <>
-      {/* Whisper-Quiet Typora-Style Header */}
+      {/* Whisper-Quiet Typora-Style Header with 3-Tier Progressive Blur Mask & Optical Lip */}
       <header className="no-print sticky top-0 z-40 glass-header">
-        <div className="mx-auto flex h-14 max-w-[1280px] items-center justify-between px-4 sm:px-6">
+        <div aria-hidden="true" className="glass-header-backdrop">
+          <div className="glass-header-blur glass-header-blur-1" />
+          <div className="glass-header-blur glass-header-blur-2" />
+          <div className="glass-header-blur glass-header-blur-3" />
+          <div className="glass-header-tint" />
+          <div className="glass-header-hairline" />
+        </div>
+        <div className="relative z-10 mx-auto flex h-14 max-w-[1280px] items-center justify-between px-4 sm:px-6">
           {/* Bespoke Logo + Understated Editorial Wordmark */}
           <button
             type="button"
@@ -153,7 +160,7 @@ export function NavigationShell({
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="border-t border-[var(--border-hairline)] bg-[var(--bg-paper)]/90 px-4 py-1.5"
+              className="relative z-10 border-t border-[var(--border-hairline)] bg-[var(--bg-paper)]/85 px-4 py-1.5"
             >
               <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 text-xs text-[var(--ink-secondary)]">
                 <span className="truncate">
@@ -204,7 +211,7 @@ export function NavigationShell({
                   <motion.span
                     layoutId="mobile-glass-pill"
                     transition={{ type: 'spring', stiffness: 460, damping: 34 }}
-                    className="absolute inset-0 rounded-[20px] bg-[var(--glass-pill)] shadow-inner border border-[var(--glass-border)]"
+                    className="glass-active-pill absolute inset-0 rounded-[20px]"
                   />
                 )}
                 <motion.span

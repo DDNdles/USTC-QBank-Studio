@@ -51,20 +51,21 @@ export function FeedbackModal({
   return (
     <AnimatePresence>
       {target && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4"
-          onClick={handleClose}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="glass-scrim absolute inset-0"
+            onClick={handleClose}
+          />
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 10 }}
             transition={{ type: 'spring', stiffness: 420, damping: 32 }}
             onClick={e => e.stopPropagation()}
-            className="paper-card w-full max-w-lg rounded-2xl overflow-hidden"
+            className="glass-sheet relative z-10 w-full max-w-lg rounded-2xl overflow-hidden"
           >
             <div className="flex items-center justify-between border-b border-[var(--border-hairline)] px-5 py-3.5">
               <div className="flex items-center gap-2">
@@ -216,7 +217,7 @@ export function FeedbackModal({
               )}
             </div>
           </motion.div>
-        </motion.div>
+        </div>
       )}
     </AnimatePresence>
   )

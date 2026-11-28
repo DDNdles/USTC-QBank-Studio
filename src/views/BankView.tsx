@@ -524,20 +524,21 @@ export function BankView({
       {/* Mobile Filter Drawer */}
       <AnimatePresence>
         {mobileFilterOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs lg:hidden flex justify-end"
-            onClick={() => setMobileFilterOpen(false)}
-          >
+          <div className="fixed inset-0 z-50 lg:hidden flex justify-end">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="glass-scrim absolute inset-0"
+              onClick={() => setMobileFilterOpen(false)}
+            />
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 360, damping: 34 }}
               onClick={e => e.stopPropagation()}
-              className="h-full w-[86vw] max-w-sm bg-[var(--bg-canvas)] border-l border-[var(--border-hairline)] p-4 overflow-y-auto"
+              className="glass-sheet relative z-10 h-full w-[86vw] max-w-sm rounded-l-2xl p-4 overflow-y-auto"
             >
               <div className="flex items-center justify-between pb-3 mb-4 border-b border-[var(--border-hairline)]">
                 <span className="font-editorial text-base font-semibold">题库精细筛选</span>
@@ -551,7 +552,7 @@ export function BankView({
               </div>
               {filterPanel}
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
